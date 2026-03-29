@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:marketi_app/core/services/app_router_service.dart';
-import 'package:marketi_app/core/services/app_state_service.dart';
+import 'core/services/app_router_service.dart';
+import 'core/services/app_state_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   final appStateService = AppStateService();
+
   final appRouterService = AppRouterService(appStateService);
 
   runApp(MyApp(router: appRouterService.router));
