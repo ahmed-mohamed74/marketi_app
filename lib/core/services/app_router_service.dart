@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/constants/app_routes.dart';
 import 'package:marketi_app/core/services/app_state_service.dart';
+import 'package:marketi_app/features/onboarding_feature/views/screens/onbourding_screen.dart';
 
 class AppRouterService {
   final AppStateService appStateService;
@@ -10,14 +11,14 @@ class AppRouterService {
 
   AppRouterService(this.appStateService) {
     router = GoRouter(
-      initialLocation: AppRoutes.onboarding, 
+      initialLocation: AppRoutes.onboarding,
 
       refreshListenable: appStateService,
 
       routes: [
         GoRoute(
           path: AppRoutes.onboarding,
-          builder: (context, state) => const Placeholder(),
+          builder: (context, state) => const OnbourdingScreen(),
         ),
 
         GoRoute(
@@ -34,27 +35,25 @@ class AppRouterService {
       redirect: (context, state) {
         final isFirstTime = appStateService.getFirstTime();
         final isLoggedIn = appStateService.getLoggedIn();
-
         final location = state.matchedLocation;
 
-        // 🔥 First time → onboarding
+        // 1️⃣ First time → onboarding
         if (isFirstTime && location != AppRoutes.onboarding) {
           return AppRoutes.onboarding;
         }
 
-        // 🔥 Not logged in → login
-        if (!isLoggedIn && location != AppRoutes.login) {
+        // 2️⃣ Onboarding complete but not logged in → login
+        if (!isFirstTime && !isLoggedIn && location != AppRoutes.login) {
           return AppRoutes.login;
         }
 
-        // 🔥 Logged in → home
+        // 3️⃣ Logged in → home
         if (isLoggedIn &&
-            (location == AppRoutes.login ||
-             location == AppRoutes.onboarding)) {
+            (location == AppRoutes.login || location == AppRoutes.onboarding)) {
           return AppRoutes.home;
         }
 
-        return null;
+        return null; // no redirect
       },
     );
   }
