@@ -41,11 +41,21 @@ class AppTextStyles {
     fontWeight: FontWeight.w500,
     color: AppColors.darkBlueColor,
   );
+  static const TextStyle bodyText = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    color: AppColors.navyColor,
+  );
 
   // Buttons
   static const TextStyle button = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w500,
     color: Colors.white,
+  );
+  static const TextStyle hintText = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    color: AppColors.greyScaleColor,
   );
 }

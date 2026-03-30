@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/common/widgets/primary_button_widget.dart';
 import 'package:marketi_app/core/constants/app_routes.dart';
 import 'package:marketi_app/core/themes/styles.dart';
-import 'package:marketi_app/features/onboarding_feature/view_model/cubit/onbourd_cubit.dart';
+import 'package:marketi_app/features/onboarding_feature/views/cubit/onbourd_cubit.dart';
 import 'package:marketi_app/features/onboarding_feature/view_model/lists/onbourd_list.dart';
 import 'package:marketi_app/features/onboarding_feature/views/widgets/indicator.dart';
 
