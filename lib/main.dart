@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider.value(value: appStateService), 
+        ChangeNotifierProvider.value(value: appStateService),
 
         BlocProvider(create: (context) => OnbourdCubit(appStateService)),
 

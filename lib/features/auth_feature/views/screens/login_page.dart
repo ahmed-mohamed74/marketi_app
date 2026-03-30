@@ -40,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
-            } else if (state is AuthSuccess) {
+            } else if (state is AuthLoginSuccess) {
               context.read<AppStateService>().login();
             }
           },

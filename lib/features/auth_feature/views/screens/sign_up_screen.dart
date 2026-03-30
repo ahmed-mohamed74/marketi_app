@@ -26,7 +26,10 @@ class _SignUpPageState extends State<SignUpPage> {
   final formKey = GlobalKey<FormState>();
   @override
   void dispose() {
+    nameController.dispose();
     emailController.dispose();
+    phoneNumberController.dispose();
+    confirmPasswordController.dispose();
     passwordController.dispose();
     super.dispose();
   }
@@ -42,8 +45,11 @@ class _SignUpPageState extends State<SignUpPage> {
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
-            } else if (state is AuthSuccess) {
-              GoRouter.of(context).go(AppRoutes.home);
+            } else if (state is AuthSignUpSuccess) {
+              context.go(AppRoutes.login);
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.message)));
             }
           },
           builder: (context, state) {
@@ -55,7 +61,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SizedBox(height: 20),
+                        SizedBox(height: 30),
                         Image.asset(
                           AssetImages.marketiLogo,
                           fit: BoxFit.cover,
@@ -138,10 +144,16 @@ class _SignUpPageState extends State<SignUpPage> {
                                 onPressed: () {
                                   if (formKey.currentState!.validate()) {
                                     context.read<AuthBloc>().add(
-                                      AuthLogin(
+                                      AuthSignUp(
+                                        name: nameController.text.trim(),
+                                        phone: phoneNumberController.text
+                                            .trim(),
                                         email: emailController.text.trim(),
                                         password: passwordController.text
                                             .trim(),
+                                        confirmPassword:
+                                            confirmPasswordController.text
+                                                .trim(),
                                       ),
                                     );
                                   }
