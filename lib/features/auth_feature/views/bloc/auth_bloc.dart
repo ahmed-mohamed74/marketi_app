@@ -6,7 +6,7 @@ import 'package:marketi_app/core/services/api/api_consumer.dart';
 import 'package:marketi_app/core/services/api/end_points.dart';
 import 'package:marketi_app/core/services/api/errors/server_exceptions.dart';
 import 'package:marketi_app/core/services/cache/cache_helper.dart';
-import 'package:marketi_app/features/auth_feature/view_model/signIn_model.dart';
+import 'package:marketi_app/features/auth_feature/view_model/user_model.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -14,9 +14,9 @@ part 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final ApiConsumer api;
   bool isChecked = false;
-  SignInModel? user;
+  UserModel? user;
   void changeCheckBox(bool value) {
-    isChecked = value; 
+    isChecked = value;
     emit(AuthRememberMe());
   }
 
@@ -28,11 +28,31 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           EndPoints.signIn,
           data: {ApiKey.email: event.email, ApiKey.password: event.password},
         );
-        user = SignInModel.fromJson(response);
+        user = UserModel.fromJson(response);
         final decodedToken = JwtDecoder.decode(user!.token);
         CacheHelper().saveData(key: ApiKey.token, value: user!.token);
         CacheHelper().saveData(key: ApiKey.id, value: decodedToken[ApiKey.id]);
-        emit(AuthSuccess());
+        emit(AuthLoginSuccess());
+      } on ServerException catch (e) {
+        emit(AuthFailure(errorMessage: e.errModel.message));
+      }
+    });
+
+    on<AuthSignUp>((event, emit) async {
+      try {
+        emit(AuthLoading());
+        final response = await api.post(
+          EndPoints.signUp,
+          data: {
+            ApiKey.name: event.name,
+            ApiKey.phone: event.phone,
+            ApiKey.email: event.email,
+            ApiKey.password: event.password,
+            ApiKey.confirmPassword: event.confirmPassword,
+          },
+        );
+        final message = response['message'];
+        emit(AuthSignUpSuccess(message: message));
       } on ServerException catch (e) {
         emit(AuthFailure(errorMessage: e.errModel.message));
       }
