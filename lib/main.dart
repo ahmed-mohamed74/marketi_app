@@ -1,13 +1,19 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:marketi_app/features/onboarding_feature/view_model/cubit/onbourd_cubit.dart';
-import 'core/services/app_router_service.dart';
-import 'core/services/app_state_service.dart';
+import 'package:marketi_app/core/services/api/dio_consumer.dart';
+import 'package:marketi_app/core/services/cache/cache_helper.dart';
+import 'package:marketi_app/features/auth_feature/views/bloc/auth_bloc.dart';
+import 'package:marketi_app/features/auth_feature/views/screens/login_page.dart';
+import 'package:marketi_app/features/onboarding_feature/views/cubit/onbourd_cubit.dart';
+import 'package:provider/provider.dart';
+import 'core/services/routing/app_router_service.dart';
+import 'core/services/routing/app_state_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  CacheHelper().init();
   final appStateService = AppStateService();
 
   final appRouterService = AppRouterService(appStateService);
@@ -25,9 +31,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
+    return MultiProvider(
       providers: [
+        ChangeNotifierProvider.value(value: appStateService), 
+
         BlocProvider(create: (context) => OnbourdCubit(appStateService)),
+
+        BlocProvider(
+          create: (context) => AuthBloc(api: DioConsumer(dio: Dio())),
+        ),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

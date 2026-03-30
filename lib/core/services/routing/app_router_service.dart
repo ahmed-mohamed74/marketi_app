@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/constants/app_routes.dart';
-import 'package:marketi_app/core/services/app_state_service.dart';
+import 'package:marketi_app/core/services/routing/app_state_service.dart';
+import 'package:marketi_app/features/auth_feature/views/screens/login_page.dart';
+import 'package:marketi_app/features/auth_feature/views/screens/sign_up_screen.dart';
 import 'package:marketi_app/features/onboarding_feature/views/screens/onbourding_screen.dart';
 
 class AppRouterService {
@@ -23,7 +25,11 @@ class AppRouterService {
 
         GoRoute(
           path: AppRoutes.login,
-          builder: (context, state) => const Placeholder(),
+          builder: (context, state) => const LoginPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.signUp,
+          builder: (context, state) => const SignUpPage(),
         ),
 
         GoRoute(
@@ -43,7 +49,10 @@ class AppRouterService {
         }
 
         // 2️⃣ Onboarding complete but not logged in → login
-        if (!isFirstTime && !isLoggedIn && location != AppRoutes.login) {
+        if (!isFirstTime &&
+            !isLoggedIn &&
+            location != AppRoutes.login &&
+            location != AppRoutes.signUp) {
           return AppRoutes.login;
         }
 
