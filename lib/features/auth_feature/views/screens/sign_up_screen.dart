@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:marketi_app/core/common/widgets/back_button_widget.dart';
 import 'package:marketi_app/core/common/widgets/loader.dart';
 import 'package:marketi_app/core/common/widgets/primary_button_widget.dart';
 import 'package:marketi_app/core/constants/app_routes.dart';
@@ -186,26 +187,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     Positioned(
                       top: 30,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.lightBlueColor),
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(width: 4),
-                            IconButton(
-                              onPressed: () {
-                                context.go(AppRoutes.login);
-                              },
-                              icon: Icon(
-                                Icons.arrow_back_ios,
-                                color: AppColors.darkBlueColor,
-                              ),
-                              iconSize: 25,
-                            ),
-                          ],
-                        ),
+                      child: BackButtonWidget(
+                        onPressed: () {
+                          context.go(AppRoutes.login);
+                        },
                       ),
                     ),
                   ],
@@ -218,3 +203,4 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 }
+

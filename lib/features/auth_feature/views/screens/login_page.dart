@@ -53,7 +53,6 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     SizedBox(height: 60),
                     Image.asset(AssetImages.marketiLogo, fit: BoxFit.cover),
-                    //SizedBox(height: 30),
                     AuthTextFieldWidget(
                       hintText: 'Username or Email',
                       controller: emailController,
@@ -88,7 +87,9 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         Expanded(child: Container()),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            context.go(AppRoutes.resetPage);
+                          },
                           child: const Text(
                             "Forget Password?",
                             style: TextStyle(

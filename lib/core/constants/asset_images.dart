@@ -7,4 +7,12 @@ class AssetImages {
       'assets/images/onboarding_images/onboarding_image2.png';
   static String onboardingImage3 =
       'assets/images/onboarding_images/onboarding_image3.png';
+  static String forgotPasswordImage =
+      'assets/images/auth_images/Illustration_Forgot_Password_With_Email.png';
+  static String verificationCodeImage =
+      'assets/images/auth_images/Illustration_Verification_Code_With_Email.png';
+  static String createNewPasswordImage =
+      'assets/images/auth_images/Illustration_Create_New_Password.png';
+  static String congratulationsImage =
+      'assets/images/auth_images/Illustration_Congratulations.png';
 }

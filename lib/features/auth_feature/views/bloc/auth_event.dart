@@ -26,4 +26,29 @@ final class AuthLogin extends AuthEvent {
   AuthLogin({required this.email, required this.password});
 }
 
+final class AuthRestPassword extends AuthEvent {
+  final String email;
+
+  AuthRestPassword({required this.email});
+}
+
+final class AuthVerifyCode extends AuthEvent {
+  final String email;
+  final String code;
+
+  AuthVerifyCode({required this.email, required this.code});
+}
+
+final class AuthConfirmResetPassword extends AuthEvent {
+  final String email;
+  final String passsword;
+  final String confirmPasssword;
+
+  AuthConfirmResetPassword({
+    required this.email,
+    required this.passsword,
+    required this.confirmPasssword,
+  });
+}
+
 final class AuthIsUserLoggedIn extends AuthEvent {}
