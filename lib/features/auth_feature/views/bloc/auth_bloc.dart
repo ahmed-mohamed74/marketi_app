@@ -6,15 +6,14 @@ import 'package:marketi_app/core/services/api/api_consumer.dart';
 import 'package:marketi_app/core/services/api/end_points.dart';
 import 'package:marketi_app/core/services/api/errors/server_exceptions.dart';
 import 'package:marketi_app/core/services/cache/cache_helper.dart';
-import 'package:marketi_app/features/auth_feature/view_model/user_model.dart';
-
+import 'package:marketi_app/features/auth_feature/view_model/sign_in_model.dart';
 part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final ApiConsumer api;
   bool isChecked = false;
-  UserModel? user;
+  SignInModel? user;
   void changeCheckBox(bool value) {
     isChecked = value;
     emit(AuthRememberMe());
@@ -28,7 +27,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           EndPoints.signIn,
           data: {ApiKey.email: event.email, ApiKey.password: event.password},
         );
-        user = UserModel.fromJson(response);
+        user = SignInModel.fromJson(response);
+        print('response: ${response}');
+        print('user: ${user}');
         final decodedToken = JwtDecoder.decode(user!.token);
         CacheHelper().saveData(key: ApiKey.token, value: user!.token);
         CacheHelper().saveData(key: ApiKey.id, value: decodedToken[ApiKey.id]);
@@ -53,6 +54,51 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
         final message = response['message'];
         emit(AuthSignUpSuccess(message: message));
+      } on ServerException catch (e) {
+        emit(AuthFailure(errorMessage: e.errModel.message));
+      }
+    });
+    on<AuthRestPassword>((event, emit) async {
+      try {
+        emit(AuthLoading());
+        final response = await api.post(
+          EndPoints.resetPassword,
+          data: {ApiKey.email: event.email},
+        );
+        final message = response['message'];
+        emit(AuthResetPasswordSuccess(message: message));
+      } on ServerException catch (e) {
+        emit(AuthFailure(errorMessage: e.errModel.message));
+      }
+    });
+    on<AuthVerifyCode>((event, emit) async {
+      try {
+        emit(AuthLoading());
+        final response = await api.post(
+          EndPoints.verificationResetPass,
+          data: {ApiKey.email: event.email, ApiKey.code: event.code},
+        );
+        print('active code response: ${response}');
+        // final message = response['message'];
+        emit(AuthVerifyCodeSuccess());
+      } on ServerException catch (e) {
+        emit(AuthFailure(errorMessage: e.errModel.message));
+      }
+    });
+    on<AuthConfirmResetPassword>((event, emit) async {
+      try {
+        emit(AuthLoading());
+        final response = await api.post(
+          EndPoints.confirmResetPassword,
+          data: {
+            ApiKey.email: event.email,
+            ApiKey.password: event.passsword,
+            ApiKey.confirmPassword: event.confirmPasssword,
+          },
+        );
+        print('active code response: ${response}');
+        // final message = response['message'];
+        emit(AuthCreateNewPasswordSuccess());
       } on ServerException catch (e) {
         emit(AuthFailure(errorMessage: e.errModel.message));
       }

@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/constants/app_routes.dart';
 import 'package:marketi_app/core/services/routing/app_state_service.dart';
+import 'package:marketi_app/features/auth_feature/views/screens/reset_password_pages/congratulation_page.dart';
 import 'package:marketi_app/features/auth_feature/views/screens/login_page.dart';
+import 'package:marketi_app/features/auth_feature/views/screens/reset_password_pages/new_password_page.dart';
+import 'package:marketi_app/features/auth_feature/views/screens/reset_password_pages/reset_password_page.dart';
 import 'package:marketi_app/features/auth_feature/views/screens/sign_up_screen.dart';
+import 'package:marketi_app/features/auth_feature/views/screens/reset_password_pages/verification_code_page.dart';
 import 'package:marketi_app/features/onboarding_feature/views/screens/onbourding_screen.dart';
 
 class AppRouterService {
@@ -31,6 +35,22 @@ class AppRouterService {
           path: AppRoutes.signUp,
           builder: (context, state) => const SignUpPage(),
         ),
+        GoRoute(
+          path: AppRoutes.resetPage,
+          builder: (context, state) => const ResetPasswordPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.verificationPage,
+          builder: (context, state) => const VerificationCodePage(email: ''),
+        ),
+        GoRoute(
+          path: AppRoutes.newPasswordPage,
+          builder: (context, state) => const NewPasswordPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.congratulationPage,
+          builder: (context, state) => const CongratulationPage(),
+        ),
 
         GoRoute(
           path: AppRoutes.home,
@@ -43,22 +63,28 @@ class AppRouterService {
         final isLoggedIn = appStateService.getLoggedIn();
         final location = state.matchedLocation;
 
+        // Always allow onboarding, login, signup, and reset pages without redirecting
+        const allowedWithoutRedirect = [
+          AppRoutes.onboarding,
+          AppRoutes.login,
+          AppRoutes.signUp,
+          AppRoutes.resetPage,
+        ];
+
         // 1️⃣ First time → onboarding
         if (isFirstTime && location != AppRoutes.onboarding) {
           return AppRoutes.onboarding;
         }
 
-        // 2️⃣ Onboarding complete but not logged in → login
+        // 2️⃣ Not logged in → login (unless on allowed pages)
         if (!isFirstTime &&
             !isLoggedIn &&
-            location != AppRoutes.login &&
-            location != AppRoutes.signUp) {
+            !allowedWithoutRedirect.contains(location)) {
           return AppRoutes.login;
         }
 
-        // 3️⃣ Logged in → home
-        if (isLoggedIn &&
-            (location == AppRoutes.login || location == AppRoutes.onboarding)) {
+        // 3️⃣ Logged in → home (cannot go to auth/onboarding pages)
+        if (isLoggedIn && allowedWithoutRedirect.contains(location)) {
           return AppRoutes.home;
         }
 

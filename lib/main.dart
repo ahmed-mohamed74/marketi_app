@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/services/api/dio_consumer.dart';
 import 'package:marketi_app/core/services/cache/cache_helper.dart';
 import 'package:marketi_app/features/auth_feature/views/bloc/auth_bloc.dart';
-import 'package:marketi_app/features/auth_feature/views/screens/login_page.dart';
 import 'package:marketi_app/features/onboarding_feature/views/cubit/onbourd_cubit.dart';
 import 'package:provider/provider.dart';
 import 'core/services/routing/app_router_service.dart';
@@ -45,6 +44,9 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         routerConfig: router,
       ),
+      // child: MaterialApp(
+      //   home: CongratulationPage(),
+      // ),
     );
   }
 }
