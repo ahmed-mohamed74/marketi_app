@@ -11,7 +11,8 @@ import 'package:marketi_app/features/auth_feature/views/bloc/auth_bloc.dart';
 import 'package:marketi_app/features/auth_feature/views/widgets/authTextFieldWidget.dart';
 
 class NewPasswordPage extends StatefulWidget {
-  const NewPasswordPage({super.key});
+  final String email;
+  const NewPasswordPage({super.key, required this.email});
 
   @override
   State<NewPasswordPage> createState() => _NewPasswordPageState();
@@ -25,7 +26,7 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: BackButtonWidget(onPressed: () {}),
+        leading: BackButtonWidget(onPressed: () => context.pop()),
         leadingWidth: 64,
         title: Text('Create New Password', style: AppTextStyles.appBarTitle1),
         centerTitle: true,
@@ -97,7 +98,7 @@ class _NewPasswordPageState extends State<NewPasswordPage> {
                               if (formKey.currentState!.validate()) {
                                 context.read<AuthBloc>().add(
                                   AuthConfirmResetPassword(
-                                    email: passwordController.text.trim(),
+                                    email: widget.email,
                                     passsword: passwordController.text.trim(),
                                     confirmPasssword: confirmPasswordController
                                         .text
