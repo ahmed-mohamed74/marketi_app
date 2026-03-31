@@ -1,0 +1,40 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:marketi_app/core/services/api/dio_consumer.dart';
+import 'package:marketi_app/core/services/routing/app_state_service.dart';
+import 'package:marketi_app/core/themes/app_theme.dart';
+import 'package:marketi_app/core/themes/colors.dart';
+import 'package:marketi_app/features/auth_feature/views/bloc/auth_bloc.dart';
+import 'package:marketi_app/features/onboarding_feature/views/cubit/onbourd_cubit.dart';
+import 'package:provider/provider.dart';
+
+class MyApp extends StatelessWidget {
+  final AppStateService appStateService;
+  final GoRouter router;
+
+  const MyApp({super.key, required this.router, required this.appStateService});
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: appStateService),
+        BlocProvider(create: (context) => OnbourdCubit(appStateService)),
+        BlocProvider(
+          create: (context) => AuthBloc(api: DioConsumer(dio: Dio())),
+        ),
+      ],
+      child: MaterialApp.router(
+        theme: AppTheme.lightTheme,
+        debugShowCheckedModeBanner: false,
+        routerConfig: router,
+      ),
+      // child: MaterialApp(
+      //   home: CongratulationPage(),
+      // ),
+    );
+  }
+}

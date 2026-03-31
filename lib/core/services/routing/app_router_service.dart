@@ -41,11 +41,17 @@ class AppRouterService {
         ),
         GoRoute(
           path: AppRoutes.verificationPage,
-          builder: (context, state) => const VerificationCodePage(email: ''),
+          builder: (context, state) {
+            final email = state.extra as String?;
+            return VerificationCodePage(email: email ?? '');
+          },
         ),
         GoRoute(
           path: AppRoutes.newPasswordPage,
-          builder: (context, state) => const NewPasswordPage(),
+          builder: (context, state) {
+            final email = state.extra as String?;
+            return NewPasswordPage(email: email ?? '');
+          },
         ),
         GoRoute(
           path: AppRoutes.congratulationPage,
@@ -54,6 +60,10 @@ class AppRouterService {
 
         GoRoute(
           path: AppRoutes.home,
+          builder: (context, state) => const Placeholder(),
+        ),
+        GoRoute(
+          path: AppRoutes.profile,
           builder: (context, state) => const Placeholder(),
         ),
       ],

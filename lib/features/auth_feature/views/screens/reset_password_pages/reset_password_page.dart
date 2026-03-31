@@ -40,7 +40,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               context,
             ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
           } else if (state is AuthResetPasswordSuccess) {
-            context.go(AppRoutes.verificationPage);
+            context.push(
+              AppRoutes.verificationPage,
+              extra: emailController.text.trim(),
+            );
           }
         },
         builder: (context, state) {

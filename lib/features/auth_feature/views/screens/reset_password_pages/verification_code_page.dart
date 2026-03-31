@@ -11,7 +11,7 @@ import 'package:marketi_app/features/auth_feature/views/bloc/auth_bloc.dart';
 import 'package:marketi_app/features/auth_feature/views/widgets/pin_code_field.dart';
 
 class VerificationCodePage extends StatefulWidget {
-  final String email; // Pass email from reset password page
+  final String email;
   const VerificationCodePage({super.key, required this.email});
 
   @override
@@ -41,7 +41,10 @@ class _VerificationCodePageState extends State<VerificationCodePage> {
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(const SnackBar(content: Text('Code verified!')));
-            context.go(AppRoutes.newPasswordPage);
+            context.push(
+              AppRoutes.newPasswordPage,
+              extra: widget.email,
+            );
           }
         },
         builder: (context, state) {
