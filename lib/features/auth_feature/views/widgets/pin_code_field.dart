@@ -25,8 +25,12 @@ class _PinCodeFieldState extends State<PinCodeField> {
 
   @override
   void dispose() {
-    for (var node in _focusNodes) node.dispose();
-    for (var ctrl in _controllers) ctrl.dispose();
+    for (var node in _focusNodes) {
+      node.dispose();
+    }
+    for (var ctrl in _controllers) {
+      ctrl.dispose();
+    }
     super.dispose();
   }
 

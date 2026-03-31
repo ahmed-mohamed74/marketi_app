@@ -28,14 +28,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           data: {ApiKey.email: event.email, ApiKey.password: event.password},
         );
         user = SignInModel.fromJson(response);
-        print('response: ${response}');
-        print('user: ${user}');
-        final decodedToken = JwtDecoder.decode(user!.token);
+        final decodedToken = JwtDecoder.decode(user!.token ?? '');
         CacheHelper().saveData(key: ApiKey.token, value: user!.token);
         CacheHelper().saveData(key: ApiKey.id, value: decodedToken[ApiKey.id]);
         emit(AuthLoginSuccess());
       } on ServerException catch (e) {
-        emit(AuthFailure(errorMessage: e.errModel.message));
+        emit(AuthFailure(errorMessage: e.errModel.message??'Auth Failure happened (AuthLogin)'));
+      } catch (e) {
+        emit(AuthFailure(errorMessage: e.toString()));
       }
     });
 
@@ -55,7 +55,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final message = response['message'];
         emit(AuthSignUpSuccess(message: message));
       } on ServerException catch (e) {
-        emit(AuthFailure(errorMessage: e.errModel.message));
+        emit(AuthFailure(errorMessage: e.errModel.message??'Auth Failure happened (AuthSignUp)'));
       }
     });
     on<AuthRestPassword>((event, emit) async {
@@ -65,10 +65,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           EndPoints.resetPassword,
           data: {ApiKey.email: event.email},
         );
-        final message = response['message'];
+        final message = response['error'];
         emit(AuthResetPasswordSuccess(message: message));
       } on ServerException catch (e) {
-        emit(AuthFailure(errorMessage: e.errModel.message));
+        emit(AuthFailure(errorMessage: e.errModel.message??'Auth Failure happened (AuthRestPassword)'));
+      } catch (e) {
+        emit(
+          AuthFailure(
+            errorMessage: 'Auth Reset Password failure: ${e.toString()}',
+          ),
+        );
       }
     });
     on<AuthVerifyCode>((event, emit) async {
@@ -78,11 +84,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           EndPoints.verificationResetPass,
           data: {ApiKey.email: event.email, ApiKey.code: event.code},
         );
-        print('active code response: ${response}');
+        print('active code response: $response');
         // final message = response['message'];
         emit(AuthVerifyCodeSuccess());
       } on ServerException catch (e) {
-        emit(AuthFailure(errorMessage: e.errModel.message));
+        emit(AuthFailure(errorMessage: e.errModel.message??'Auth Failure happened (AuthVerifyCode)'));
       }
     });
     on<AuthConfirmResetPassword>((event, emit) async {
@@ -96,11 +102,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             ApiKey.confirmPassword: event.confirmPasssword,
           },
         );
-        print('active code response: ${response}');
+        print('active code response: $response');
         // final message = response['message'];
         emit(AuthCreateNewPasswordSuccess());
       } on ServerException catch (e) {
-        emit(AuthFailure(errorMessage: e.errModel.message));
+        emit(AuthFailure(errorMessage: e.errModel.message??'Auth Failure happened (AuthConfirmResetPassword)'));
       }
     });
   }

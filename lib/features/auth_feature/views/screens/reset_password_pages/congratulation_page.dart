@@ -5,7 +5,6 @@ import 'package:marketi_app/core/common/widgets/primary_button_widget.dart';
 import 'package:marketi_app/core/constants/app_routes.dart';
 import 'package:marketi_app/core/constants/asset_images.dart';
 import 'package:marketi_app/core/themes/styles.dart';
-import 'package:marketi_app/features/auth_feature/views/widgets/authTextFieldWidget.dart';
 
 class CongratulationPage extends StatelessWidget {
   const CongratulationPage({super.key});
