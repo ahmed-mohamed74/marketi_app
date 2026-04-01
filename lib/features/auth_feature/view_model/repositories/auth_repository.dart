@@ -1,0 +1,125 @@
+import 'package:dartz/dartz.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:marketi_app/core/services/api/api_consumer.dart';
+import 'package:marketi_app/core/services/api/end_points.dart';
+import 'package:marketi_app/core/services/api/errors/server_exceptions.dart';
+import 'package:marketi_app/core/services/cache/cache_helper.dart';
+import 'package:marketi_app/features/auth_feature/view_model/models/sign_in_model.dart';
+import 'package:marketi_app/features/auth_feature/view_model/models/user_model.dart';
+
+class AuthRepository {
+  final ApiConsumer api;
+  AuthRepository({required this.api});
+  Future<Either<String, SignInModel>> signIn({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final response = await api.post(
+        EndPoints.signIn,
+        data: {ApiKey.email: email, ApiKey.password: password},
+      );
+      final user = SignInModel.fromJson(response);
+      final decodedToken = JwtDecoder.decode(user.token ?? '');
+      CacheHelper().saveData(key: ApiKey.token, value: user.token);
+      CacheHelper().saveData(key: ApiKey.id, value: decodedToken[ApiKey.id]);
+      return Right(user);
+    } on ServerException catch (e) {
+      return Left(e.errModel.message!);
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  Future<Either<String, String>> signUp({
+    required String name,
+    required String phone,
+    required String email,
+    required String password,
+    required String confirmPassword,
+  }) async {
+    try {
+      final response = await api.post(
+        EndPoints.signUp,
+        data: {
+          ApiKey.name: name,
+          ApiKey.phone: phone,
+          ApiKey.email: email,
+          ApiKey.password: password,
+          ApiKey.confirmPassword: confirmPassword,
+        },
+      );
+      final String message = response['message'];
+      return Right(message);
+    } on ServerException catch (e) {
+      return Left(e.errModel.message ?? 'Auth Failure happened (AuthSignUp)');
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  Future<Either<String, String>> authRestPassword({
+    required String email,
+  }) async {
+    try {
+      final response = await api.post(
+        EndPoints.resetPassword,
+        data: {ApiKey.email: email},
+      );
+      final message = response['error'];
+      return Right(message);
+    } on ServerException catch (e) {
+      return Left(
+        e.errModel.message ?? 'Auth Failure happened (AuthRestPassword)',
+      );
+    } catch (e) {
+      return Left('Auth Reset Password failure: ${e.toString()}');
+    }
+  }
+
+  Future<Either<String, String>> authVerifyCode({
+    required String email,
+    required String code,
+  }) async {
+    try {
+      final response = await api.post(
+        EndPoints.verificationResetPass,
+        data: {ApiKey.email: email, ApiKey.code: code},
+      );
+      final message = response['message'];
+      return Right(message);
+    } on ServerException catch (e) {
+      return Left(
+        e.errModel.message ?? 'Auth Failure happened (AuthVerifyCode)',
+      );
+    } catch (e) {
+      return Left('Auth Verify Code failure: ${e.toString()}');
+    }
+  }
+
+  Future<Either<String, String>> authConfirmResetPassword({
+    required String email,
+    required String passsword,
+    required String confirmPasssword,
+  }) async {
+    try {
+      final response = await api.post(
+        EndPoints.confirmResetPassword,
+        data: {
+          ApiKey.email: email,
+          ApiKey.password: passsword,
+          ApiKey.confirmPassword: confirmPasssword,
+        },
+      );
+      final message = response['message'];
+      return Right(message);
+    } on ServerException catch (e) {
+      return Left(
+        e.errModel.message ??
+            'Auth Failure happened (AuthConfirmResetPassword)',
+      );
+    } catch (e) {
+      return Left('Auth Confirm Reset Password failure: ${e.toString()}');
+    }
+  }
+}

@@ -1,17 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:marketi_app/core/services/api/api_consumer.dart';
-import 'package:marketi_app/core/services/api/end_points.dart';
-import 'package:marketi_app/core/services/api/errors/server_exceptions.dart';
-import 'package:marketi_app/core/services/cache/cache_helper.dart';
-import 'package:marketi_app/features/auth_feature/view_model/sign_in_model.dart';
+import 'package:marketi_app/features/auth_feature/view_model/models/sign_in_model.dart';
+import 'package:marketi_app/features/auth_feature/view_model/repositories/auth_repository.dart';
 part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final ApiConsumer api;
+  final AuthRepository authRepository;
   bool isChecked = false;
   SignInModel? user;
   void changeCheckBox(bool value) {
@@ -19,95 +15,68 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthRememberMe());
   }
 
-  AuthBloc({required this.api}) : super(AuthInitial()) {
+  AuthBloc({required this.authRepository}) : super(AuthInitial()) {
     on<AuthLogin>((event, emit) async {
-      try {
-        emit(AuthLoading());
-        final response = await api.post(
-          EndPoints.signIn,
-          data: {ApiKey.email: event.email, ApiKey.password: event.password},
-        );
-        user = SignInModel.fromJson(response);
-        final decodedToken = JwtDecoder.decode(user!.token ?? '');
-        CacheHelper().saveData(key: ApiKey.token, value: user!.token);
-        CacheHelper().saveData(key: ApiKey.id, value: decodedToken[ApiKey.id]);
-        emit(AuthLoginSuccess());
-      } on ServerException catch (e) {
-        emit(AuthFailure(errorMessage: e.errModel.message??'Auth Failure happened (AuthLogin)'));
-      } catch (e) {
-        emit(AuthFailure(errorMessage: e.toString()));
-      }
+      emit(AuthLoading());
+      final response = await authRepository.signIn(
+        email: event.email,
+        password: event.password,
+      );
+      response.fold(
+        (errorMessage) => emit(AuthFailure(errorMessage: errorMessage)),
+        (signInModel) => emit(AuthLoginSuccess()),
+      );
     });
 
     on<AuthSignUp>((event, emit) async {
-      try {
-        emit(AuthLoading());
-        final response = await api.post(
-          EndPoints.signUp,
-          data: {
-            ApiKey.name: event.name,
-            ApiKey.phone: event.phone,
-            ApiKey.email: event.email,
-            ApiKey.password: event.password,
-            ApiKey.confirmPassword: event.confirmPassword,
-          },
-        );
-        final message = response['message'];
-        emit(AuthSignUpSuccess(message: message));
-      } on ServerException catch (e) {
-        emit(AuthFailure(errorMessage: e.errModel.message??'Auth Failure happened (AuthSignUp)'));
-      }
+      emit(AuthLoading());
+      final response = await authRepository.signUp(
+        name: event.name,
+        email: event.email,
+        password: event.password,
+        phone: event.phone,
+        confirmPassword: event.confirmPassword,
+      );
+      response.fold(
+        (errorMessage) => emit(AuthFailure(errorMessage: errorMessage)),
+        (message) => emit(AuthSignUpSuccess(message: message)),
+      );
     });
+
     on<AuthRestPassword>((event, emit) async {
-      try {
-        emit(AuthLoading());
-        final response = await api.post(
-          EndPoints.resetPassword,
-          data: {ApiKey.email: event.email},
-        );
-        final message = response['error'];
-        emit(AuthResetPasswordSuccess(message: message));
-      } on ServerException catch (e) {
-        emit(AuthFailure(errorMessage: e.errModel.message??'Auth Failure happened (AuthRestPassword)'));
-      } catch (e) {
-        emit(
-          AuthFailure(
-            errorMessage: 'Auth Reset Password failure: ${e.toString()}',
-          ),
-        );
-      }
+      emit(AuthLoading());
+      final response = await authRepository.authRestPassword(
+        email: event.email,
+      );
+      response.fold(
+        (errorMessage) => emit(AuthFailure(errorMessage: errorMessage)),
+        (message) => emit(AuthResetPasswordSuccess(message: message)),
+      );
     });
+
     on<AuthVerifyCode>((event, emit) async {
-      try {
-        emit(AuthLoading());
-        final response = await api.post(
-          EndPoints.verificationResetPass,
-          data: {ApiKey.email: event.email, ApiKey.code: event.code},
-        );
-        print('active code response: $response');
-        // final message = response['message'];
-        emit(AuthVerifyCodeSuccess());
-      } on ServerException catch (e) {
-        emit(AuthFailure(errorMessage: e.errModel.message??'Auth Failure happened (AuthVerifyCode)'));
-      }
+      emit(AuthLoading());
+      final response = await authRepository.authVerifyCode(
+        code: event.code,
+        email: event.email,
+      );
+      response.fold(
+        (errorMessage) => emit(AuthFailure(errorMessage: errorMessage)),
+        (message) => emit(AuthVerifyCodeSuccess()),
+      );
     });
+
     on<AuthConfirmResetPassword>((event, emit) async {
-      try {
-        emit(AuthLoading());
-        final response = await api.post(
-          EndPoints.confirmResetPassword,
-          data: {
-            ApiKey.email: event.email,
-            ApiKey.password: event.passsword,
-            ApiKey.confirmPassword: event.confirmPasssword,
-          },
-        );
-        print('active code response: $response');
-        // final message = response['message'];
-        emit(AuthCreateNewPasswordSuccess());
-      } on ServerException catch (e) {
-        emit(AuthFailure(errorMessage: e.errModel.message??'Auth Failure happened (AuthConfirmResetPassword)'));
-      }
+      emit(AuthLoading());
+      final response = await authRepository.authConfirmResetPassword(
+        passsword: event.passsword,
+        confirmPasssword: event.confirmPasssword,
+        email: event.email,
+      );
+      response.fold(
+        (errorMessage) => emit(AuthFailure(errorMessage: errorMessage)),
+        (message) => emit(AuthCreateNewPasswordSuccess()),
+      );
     });
   }
 }
