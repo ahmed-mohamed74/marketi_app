@@ -1,5 +1,5 @@
 import 'package:marketi_app/core/services/api/end_points.dart';
-import 'package:marketi_app/features/auth_feature/view_model/user_model.dart';
+import 'package:marketi_app/features/auth_feature/view_model/models/user_model.dart';
 
 class SignInModel {
   final String? message;

@@ -9,6 +9,7 @@ import 'package:marketi_app/features/auth_feature/views/screens/reset_password_p
 import 'package:marketi_app/features/auth_feature/views/screens/sign_up_screen.dart';
 import 'package:marketi_app/features/auth_feature/views/screens/reset_password_pages/verification_code_page.dart';
 import 'package:marketi_app/features/onboarding_feature/views/screens/onbourding_screen.dart';
+import 'package:marketi_app/features/profile_feature/views/screens/profile_page.dart';
 
 class AppRouterService {
   final AppStateService appStateService;
@@ -64,7 +65,7 @@ class AppRouterService {
         ),
         GoRoute(
           path: AppRoutes.profile,
-          builder: (context, state) => const Placeholder(),
+          builder: (context, state) => const ProfilePage(),
         ),
       ],
 
@@ -94,8 +95,12 @@ class AppRouterService {
         }
 
         // 3️⃣ Logged in → home (cannot go to auth/onboarding pages)
+        // if (isLoggedIn && allowedWithoutRedirect.contains(location)) {
+        //   return AppRoutes.home;
+        // }
+        //Todo: remove this
         if (isLoggedIn && allowedWithoutRedirect.contains(location)) {
-          return AppRoutes.home;
+          return AppRoutes.profile;
         }
 
         return null; // no redirect

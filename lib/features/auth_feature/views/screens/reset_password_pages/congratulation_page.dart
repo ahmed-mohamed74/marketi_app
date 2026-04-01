@@ -4,7 +4,6 @@ import 'package:marketi_app/core/common/widgets/back_button_widget.dart';
 import 'package:marketi_app/core/common/widgets/primary_button_widget.dart';
 import 'package:marketi_app/core/constants/app_routes.dart';
 import 'package:marketi_app/core/constants/asset_images.dart';
-import 'package:marketi_app/core/services/routing/app_router_service.dart';
 import 'package:marketi_app/core/themes/styles.dart';
 
 class CongratulationPage extends StatelessWidget {

@@ -15,4 +15,5 @@ class AssetImages {
       'assets/images/auth_images/Illustration_Create_New_Password.png';
   static String congratulationsImage =
       'assets/images/auth_images/Illustration_Congratulations.png';
+  static String profilePageShapeImage = 'assets/images/Shapes.png';
 }
