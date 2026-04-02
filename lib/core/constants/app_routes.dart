@@ -6,7 +6,10 @@ class AppRoutes {
   static const verificationPage = '/verificationPage';
   static const newPasswordPage = '/newPasswordPage';
   static const congratulationPage = '/congratulationPage';
-  
+
   static const home = '/home';
+  static const allProductsPage = '/allProductsPage';
+  static const allCategoryBrandsPage = '/allCategoryBrandsPage';
+  static const categoryPage = '/categoryPage';
   static const profile = '/profile';
 }

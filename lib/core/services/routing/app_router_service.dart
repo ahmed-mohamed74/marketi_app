@@ -7,7 +7,12 @@ import 'package:marketi_app/features/auth_feature/views/screens/reset_password_p
 import 'package:marketi_app/features/auth_feature/views/screens/reset_password_pages/reset_password_page.dart';
 import 'package:marketi_app/features/auth_feature/views/screens/sign_up_screen.dart';
 import 'package:marketi_app/features/auth_feature/views/screens/reset_password_pages/verification_code_page.dart';
+import 'package:marketi_app/features/home_feature/view_model/models/category_model.dart';
+import 'package:marketi_app/features/home_feature/view_model/models/product_model.dart';
+import 'package:marketi_app/features/home_feature/views/screens/category_page.dart';
 import 'package:marketi_app/features/home_feature/views/screens/home_page.dart';
+import 'package:marketi_app/features/home_feature/views/screens/home_pages/all_category_brands_page.dart';
+import 'package:marketi_app/features/home_feature/views/screens/home_pages/all_products_page.dart';
 import 'package:marketi_app/features/onboarding_feature/views/screens/onbourding_screen.dart';
 import 'package:marketi_app/features/profile_feature/views/screens/profile_page.dart';
 
@@ -63,6 +68,35 @@ class AppRouterService {
           path: AppRoutes.home,
           builder: (context, state) => const HomePage(),
         ),
+
+        GoRoute(
+          path: AppRoutes.categoryPage,
+          builder: (context, state) {
+            return CategoryPage();
+          },
+        ),
+        GoRoute(
+          path: AppRoutes.allProductsPage,
+          builder: (context, state) {
+            final data = state.extra as Map<String, dynamic>;
+
+            final title = data['title'] as String;
+            final items = data['items'] as List<ProductModel>;
+            return AllProductsPage(appBarTitle: title, items: items);
+          },
+        ),
+
+        GoRoute(
+          path: AppRoutes.allCategoryBrandsPage,
+          builder: (context, state) {
+            final data = state.extra as Map<String, dynamic>;
+
+            final title = data['title'] as String;
+            final items = data['items'] as List<CategoryBrandModel>;
+            return AllCategoryBrandsPage(appBarTitle: title, items: items);
+          },
+        ),
+
         GoRoute(
           path: AppRoutes.profile,
           builder: (context, state) => const ProfilePage(),
@@ -98,7 +132,6 @@ class AppRouterService {
         if (isLoggedIn && allowedWithoutRedirect.contains(location)) {
           return AppRoutes.home;
         }
-
 
         return null; // no redirect
       },

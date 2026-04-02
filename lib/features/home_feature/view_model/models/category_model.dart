@@ -1,53 +1,53 @@
 import 'dart:convert';
 
-class CategoryModel {
-  final String categoryImage;
-  final String categoryName;
-  CategoryModel({
-    required this.categoryImage,
-    required this.categoryName,
+class CategoryBrandModel {
+  final String image;
+  final String name;
+  CategoryBrandModel({
+    required this.image,
+    required this.name,
   });
 
-  CategoryModel copyWith({
-    String? categoryImage,
-    String? categoryName,
+  CategoryBrandModel copyWith({
+    String? image,
+    String? name,
   }) {
-    return CategoryModel(
-      categoryImage: categoryImage ?? this.categoryImage,
-      categoryName: categoryName ?? this.categoryName,
+    return CategoryBrandModel(
+      image: image ?? this.image,
+      name: name ?? this.name,
     );
   }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'categoryImage': categoryImage,
-      'categoryName': categoryName,
+      'image': image,
+      'name': name,
     };
   }
 
-  factory CategoryModel.fromMap(Map<String, dynamic> map) {
-    return CategoryModel(
-      categoryImage: map['categoryImage'] as String,
-      categoryName: map['categoryName'] as String,
+  factory CategoryBrandModel.fromMap(Map<String, dynamic> map) {
+    return CategoryBrandModel(
+      image: map['image'] as String,
+      name: map['name'] as String,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory CategoryModel.fromJson(String source) => CategoryModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory CategoryBrandModel.fromJson(String source) => CategoryBrandModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() => 'CategoryModel(categoryImage: $categoryImage, categoryName: $categoryName)';
+  String toString() => 'CategoryModel(categoryImage: $image, categoryName: $name)';
 
   @override
-  bool operator ==(covariant CategoryModel other) {
+  bool operator ==(covariant CategoryBrandModel other) {
     if (identical(this, other)) return true;
   
     return 
-      other.categoryImage == categoryImage &&
-      other.categoryName == categoryName;
+      other.image == image &&
+      other.name == name;
   }
 
   @override
-  int get hashCode => categoryImage.hashCode ^ categoryName.hashCode;
+  int get hashCode => image.hashCode ^ name.hashCode;
 }
