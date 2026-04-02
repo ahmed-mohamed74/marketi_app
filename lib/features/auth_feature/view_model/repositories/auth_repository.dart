@@ -5,7 +5,6 @@ import 'package:marketi_app/core/services/api/end_points.dart';
 import 'package:marketi_app/core/services/api/errors/server_exceptions.dart';
 import 'package:marketi_app/core/services/cache/cache_helper.dart';
 import 'package:marketi_app/features/auth_feature/view_model/models/sign_in_model.dart';
-import 'package:marketi_app/features/auth_feature/view_model/models/user_model.dart';
 
 class AuthRepository {
   final ApiConsumer api;

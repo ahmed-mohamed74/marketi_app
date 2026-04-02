@@ -7,8 +7,9 @@ import 'package:marketi_app/core/services/routing/app_state_service.dart';
 import 'package:marketi_app/core/themes/app_theme.dart';
 import 'package:marketi_app/features/auth_feature/view_model/repositories/auth_repository.dart';
 import 'package:marketi_app/features/auth_feature/views/bloc/auth_bloc.dart';
+import 'package:marketi_app/features/home_feature/views/bloc/cubit/home_cubit.dart';
+import 'package:marketi_app/features/home_feature/views/screens/home_page.dart';
 import 'package:marketi_app/features/onboarding_feature/views/cubit/onbourd_cubit.dart';
-import 'package:marketi_app/features/profile_feature/views/screens/profile_page.dart';
 import 'package:provider/provider.dart';
 
 class MyApp extends StatelessWidget {
@@ -29,12 +30,18 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ],
-      child: MaterialApp.router(
+      // child: MaterialApp.router(
+      //   theme: AppTheme.lightTheme,
+      //   debugShowCheckedModeBanner: false,
+      //   routerConfig: router,
+      // ),
+      child: MaterialApp(
         theme: AppTheme.lightTheme,
-        debugShowCheckedModeBanner: false,
-        routerConfig: router,
+        home: BlocProvider(
+          create: (context) => HomeCubit(),
+          child: HomePage(),
+        ),
       ),
-      // child: MaterialApp(theme: AppTheme.lightTheme, home: ProfilePage()),
     );
   }
 }
