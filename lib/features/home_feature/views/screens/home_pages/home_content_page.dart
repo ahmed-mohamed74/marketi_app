@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/constants/app_routes.dart';
 import 'package:marketi_app/features/home_feature/view_model/models/product_model.dart';
-import 'package:marketi_app/features/home_feature/views/bloc/cubit/home_cubit.dart';
+import 'package:marketi_app/features/home_feature/views/cubit/home_cubit.dart';
 import 'package:marketi_app/features/home_feature/views/widgets/carousel_slider_widget.dart';
 import 'package:marketi_app/features/home_feature/views/widgets/category_section_widget.dart';
 import 'package:marketi_app/features/home_feature/views/widgets/popular_product_section_widget.dart';
