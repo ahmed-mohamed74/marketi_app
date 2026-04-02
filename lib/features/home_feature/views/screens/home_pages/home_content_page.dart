@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:marketi_app/core/themes/colors.dart';
-import 'package:marketi_app/core/themes/styles.dart';
+import 'package:go_router/go_router.dart';
+import 'package:marketi_app/core/constants/app_routes.dart';
+import 'package:marketi_app/features/home_feature/view_model/models/product_model.dart';
 import 'package:marketi_app/features/home_feature/views/bloc/cubit/home_cubit.dart';
 import 'package:marketi_app/features/home_feature/views/widgets/carousel_slider_widget.dart';
 import 'package:marketi_app/features/home_feature/views/widgets/category_section_widget.dart';
@@ -50,7 +51,15 @@ class _HomeContentState extends State<HomeContent> {
                   children: [
                     SectionHeaderWidget(
                       title: 'Popular Product',
-                      onPressed: () {},
+                      onPressed: () {
+                        context.push(
+                          AppRoutes.allProductsPage,
+                          extra: {
+                            'title': 'Popular Product',
+                            'items': state.popularProducts,
+                          },
+                        );
+                      },
                     ),
                     state.popularProducts.isNotEmpty
                         ? ProductsSectionWidget(
@@ -69,12 +78,22 @@ class _HomeContentState extends State<HomeContent> {
               builder: (context, state) {
                 return Column(
                   children: [
-                    SectionHeaderWidget(title: 'Category', onPressed: () {}),
+                    SectionHeaderWidget(
+                      title: 'Category',
+                      onPressed: () {
+                        context.push(
+                          AppRoutes.allCategoryBrandsPage,
+                          extra: {
+                            'title': 'Category',
+                            'items': state.categories,
+                          },
+                        );
+                      },
+                    ),
                     state.categories.isNotEmpty
                         ? CategoryBrandSectionWidget(
                             isBrand: false,
-                            categories: state.categories,
-                            brands: state.brands,
+                            items: state.categories,
                           )
                         : const SizedBox(
                             height: 60,
@@ -91,7 +110,15 @@ class _HomeContentState extends State<HomeContent> {
                   children: [
                     SectionHeaderWidget(
                       title: 'Best for You',
-                      onPressed: () {},
+                      onPressed: () {
+                        context.push(
+                          AppRoutes.allProductsPage,
+                          extra: {
+                            'title': 'Best for You',
+                            'items': state.bestProducts,
+                          },
+                        );
+                      },
                     ),
                     state.bestProducts.isNotEmpty
                         ? ProductsSectionWidget(
@@ -111,12 +138,19 @@ class _HomeContentState extends State<HomeContent> {
               builder: (context, state) {
                 return Column(
                   children: [
-                    SectionHeaderWidget(title: 'Brands', onPressed: () {}),
-                    state.categories.isNotEmpty
+                    SectionHeaderWidget(title: 'Brands', onPressed: () {
+                      context.push(
+                          AppRoutes.allCategoryBrandsPage,
+                          extra: {
+                            'title': 'Brands',
+                            'items': state.brands,
+                          },
+                        );
+                    }),
+                    state.brands.isNotEmpty
                         ? CategoryBrandSectionWidget(
                             isBrand: true,
-                            categories: state.categories,
-                            brands: state.brands,
+                            items: state.brands,
                           )
                         : const SizedBox(
                             height: 60,
@@ -131,7 +165,18 @@ class _HomeContentState extends State<HomeContent> {
               builder: (context, state) {
                 return Column(
                   children: [
-                    SectionHeaderWidget(title: 'Buy Again', onPressed: () {}),
+                    SectionHeaderWidget(
+                      title: 'Buy Again',
+                      onPressed: () {
+                        context.push(
+                          AppRoutes.allProductsPage,
+                          extra: {
+                            'title': 'Buy Again',
+                            'items': state.buyAgainProducts,
+                          },
+                        );
+                      },
+                    ),
                     state.bestProducts.isNotEmpty
                         ? ProductsSectionWidget(
                             withAddButton: true,

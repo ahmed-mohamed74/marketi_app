@@ -5,8 +5,8 @@ class HomeState {
   final List<ProductModel> popularProducts;
   final List<ProductModel> bestProducts;
   final List<ProductModel> buyAgainProducts;
-  final List<CategoryModel> categories;
-  final List<BrandModel> brands;
+  final List<CategoryBrandModel> categories;
+  final List<CategoryBrandModel> brands;
   final bool isLoading;
 
   const HomeState({
@@ -22,8 +22,8 @@ class HomeState {
     List<ProductModel>? popularProducts,
     List<ProductModel>? bestProducts,
     List<ProductModel>? buyAgainProducts,
-    List<CategoryModel>? categories,
-    List<BrandModel>? brands,
+    List<CategoryBrandModel>? categories,
+    List<CategoryBrandModel>? brands,
     bool? isLoading,
   }) {
     return HomeState(

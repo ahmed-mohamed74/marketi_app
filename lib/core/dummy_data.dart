@@ -1,4 +1,3 @@
-import 'package:marketi_app/features/home_feature/view_model/models/brand_model.dart';
 import 'package:marketi_app/features/home_feature/view_model/models/category_model.dart';
 import 'package:marketi_app/features/home_feature/view_model/models/product_model.dart';
 
@@ -142,35 +141,35 @@ class DummyData {
       rate: '4.8',
     ),
   ];
-  static List<CategoryModel> categories = [
-    CategoryModel(
-      categoryImage: 'assets/images/dummy_images/11 (1).jpg',
-      categoryName: 'Plants',
+  static List<CategoryBrandModel> categories = [
+    CategoryBrandModel(
+      image: 'assets/images/dummy_images/11 (1).jpg',
+      name: 'Plants',
     ),
-    CategoryModel(
-      categoryImage: 'assets/images/dummy_images/11 (1).png',
-      categoryName: 'Fashion',
+    CategoryBrandModel(
+      image: 'assets/images/dummy_images/11 (1).png',
+      name: 'Fashion',
     ),
-    CategoryModel(
-      categoryImage: 'assets/images/dummy_images/11 (2).jpg',
-      categoryName: 'Electronics',
+    CategoryBrandModel(
+      image: 'assets/images/dummy_images/11 (2).jpg',
+      name: 'Electronics',
     ),
-    CategoryModel(
-      categoryImage: 'assets/images/dummy_images/11 (2).png',
-      categoryName: 'Food',
+    CategoryBrandModel(
+      image: 'assets/images/dummy_images/11 (2).png',
+      name: 'Food',
     ),
-    CategoryModel(
-      categoryImage: 'assets/images/dummy_images/11 (3).jpg',
-      categoryName: 'Pampers',
+    CategoryBrandModel(
+      image: 'assets/images/dummy_images/11 (3).jpg',
+      name: 'Pampers',
     ),
-    CategoryModel(
-      categoryImage: 'assets/images/dummy_images/11 (3).png',
-      categoryName: 'Phones',
+    CategoryBrandModel(
+      image: 'assets/images/dummy_images/11 (3).png',
+      name: 'Phones',
     ),
   ];
-  static List<BrandModel> brands = [
-    BrandModel(brandImage: 'assets/images/dummy_images/brand (1).jpg'),
-    BrandModel(brandImage: 'assets/images/dummy_images/brand (1).png'),
-    BrandModel(brandImage: 'assets/images/dummy_images/brand (2).png'),
+  static List<CategoryBrandModel> brands = [
+    CategoryBrandModel(image: 'assets/images/dummy_images/brand (1).jpg', name: 'Town Team'),
+    CategoryBrandModel(image: 'assets/images/dummy_images/brand (1).png', name: 'SONY'),
+    CategoryBrandModel(image: 'assets/images/dummy_images/brand (2).png', name: 'JBL'),
   ];
 }

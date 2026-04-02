@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:marketi_app/core/dummy_data.dart';
-import 'package:marketi_app/features/home_feature/view_model/models/brand_model.dart';
 import 'package:marketi_app/features/home_feature/view_model/models/category_model.dart';
 import 'package:marketi_app/features/home_feature/view_model/models/product_model.dart';
 

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
-import 'package:marketi_app/features/home_feature/view_model/models/product_model.dart';
 
 class SearchSectionWidget extends StatelessWidget {
-  final List<ProductModel> products;
+  final List<dynamic> products;
   const SearchSectionWidget({super.key, required this.products});
 
   @override
@@ -32,7 +31,8 @@ class SearchSectionWidget extends StatelessWidget {
 }
 
 class DataSearch extends SearchDelegate<String> {
-  final List<ProductModel> products;
+  final List<dynamic> products;
+  static List<String> searchHistory = [];
 
   DataSearch({
     super.searchFieldLabel,
@@ -68,28 +68,137 @@ class DataSearch extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    return Center(child: Text('No Product contain searched characters!!'));
+    final results = products
+        .where(
+          (p) =>
+              (p.productName ?? '').toLowerCase().contains(query.toLowerCase()),
+        )
+        .toList();
+
+    if (results.isEmpty) {
+      return Center(child: Text('No Product found'));
+    }
+
+    return ListView.builder(
+      itemCount: results.length,
+      itemBuilder: (context, index) {
+        return ListTile(title: Text(results[index].productName ?? ''));
+      },
+    );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
+    // Popular = أول 5 منتجات مثلا
+    final popularProducts = products.take(5).toList();
+
     var searchList = query.isEmpty
-        ? products
+        ? []
         : products
               .where(
-                (p) => p.productName!.toLowerCase().startsWith(
+                (p) => (p.productName ?? '').toLowerCase().contains(
                   query.toLowerCase(),
                 ),
               )
               .toList();
 
-    return ListView.builder(
-      itemCount: searchList.length,
-      itemBuilder: (context, index) {
-        return ListTile(
-          title: Text(searchList[index].productName ?? 'no product'),
-        );
-      },
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (query.isEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Text('Popular Search', style: AppTextStyles.heading2),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Wrap(
+                spacing: 20,
+                children: popularProducts.map((p) {
+                  return ActionChip(
+                    color: WidgetStatePropertyAll(
+                      AppColors.lightBlueColor.withValues(alpha: 0.5),
+                    ),
+                    label: Text(
+                      p.productName ?? '',
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.primaryColor,
+                      ),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(40),
+                      side: BorderSide(
+                        width: 0,
+                        color: AppColors.lightBlueColor.withValues(alpha: 0.1),
+                      ),
+                    ),
+                    onPressed: () {
+                      query = p.productName ?? '';
+                      showResults(context);
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+          ],
+
+          if (query.isEmpty && searchHistory.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Text('Search History', style: AppTextStyles.heading2),
+            ),
+
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: searchHistory.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(searchHistory[index]),
+                  trailing: IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () {
+                      searchHistory.removeAt(index);
+                      showSuggestions(context);
+                    },
+                  ),
+                  onTap: () {
+                    query = searchHistory[index];
+                    showResults(context);
+                  },
+                );
+              },
+            ),
+          ],
+
+          /// 🔍 Search Results
+          if (query.isNotEmpty) ...[
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: searchList.length,
+              itemBuilder: (context, index) {
+                final product = searchList[index];
+
+                return ListTile(
+                  title: Text(product.productName ?? ''),
+                  onTap: () {
+                    // searchHistory.remove(product.productName);
+                    searchHistory.insert(0, product.productName ?? '');
+
+                    query = product.productName ?? '';
+                    showResults(context);
+                  },
+                );
+              },
+            ),
+          ],
+        ],
+      ),
     );
   }
 }
