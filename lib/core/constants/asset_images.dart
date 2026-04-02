@@ -16,4 +16,9 @@ class AssetImages {
   static String congratulationsImage =
       'assets/images/auth_images/Illustration_Congratulations.png';
   static String profilePageShapeImage = 'assets/images/Shapes.png';
+  static String caroaselImage = 'assets/images/caroasel_image.jpg';
+  static String product1Image = 'assets/images/product1_image.png';
+  static String product2Image = 'assets/images/product2_image.png';
+  static String categoryImage = 'assets/images/categoryImage.jpg';
+  
 }
