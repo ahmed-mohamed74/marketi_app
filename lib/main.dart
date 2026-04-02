@@ -6,7 +6,7 @@ import 'core/services/routing/app_state_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  CacheHelper().init();x``
+  CacheHelper().init();
   final appStateService = AppStateService();
   final appRouterService = AppRouterService(appStateService);
   runApp(
