@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class AppStateService extends ChangeNotifier { 
+class AppStateService extends ChangeNotifier {
   /////////////////
   bool isFirstTime = false;
   bool isLoggedIn = true;
