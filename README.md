@@ -1,6 +1,6 @@
 # marketi_app
 
-## ⚫️ App Screens In Dark mode:
+## ⚫️ App Screens :
 
 <table>
 <tr>
