@@ -1,53 +1,47 @@
 import 'dart:convert';
 
-class CategoryBrandModel {
+class CategoryModel {
   final String image;
   final String name;
-  CategoryBrandModel({
+  final String slug;
+  final String url;
+  CategoryModel({
     required this.image,
     required this.name,
+    required this.slug,
+    required this.url,
   });
 
-  CategoryBrandModel copyWith({
+  CategoryModel copyWith({
     String? image,
     String? name,
+    String? slug,
+    String? url,
   }) {
-    return CategoryBrandModel(
+    return CategoryModel(
       image: image ?? this.image,
       name: name ?? this.name,
+      slug: slug ?? this.slug,
+      url: url ?? this.url,
     );
   }
 
   Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'image': image,
-      'name': name,
-    };
+    return <String, dynamic>{'image': image, 'name': name, 'slug': slug, 'url': url};
   }
 
-  factory CategoryBrandModel.fromMap(Map<String, dynamic> map) {
-    return CategoryBrandModel(
+  factory CategoryModel.fromMap(Map<String, dynamic> map) {
+    return CategoryModel(
       image: map['image'] as String,
       name: map['name'] as String,
+      slug: map['slug'] as String,
+      url: map['url'] as String,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory CategoryBrandModel.fromJson(String source) => CategoryBrandModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory CategoryModel.fromJson(String source) =>
+      CategoryModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
-  @override
-  String toString() => 'CategoryModel(categoryImage: $image, categoryName: $name)';
-
-  @override
-  bool operator ==(covariant CategoryBrandModel other) {
-    if (identical(this, other)) return true;
-  
-    return 
-      other.image == image &&
-      other.name == name;
-  }
-
-  @override
-  int get hashCode => image.hashCode ^ name.hashCode;
 }

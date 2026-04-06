@@ -1,26 +1,43 @@
-import 'package:marketi_app/core/services/api/end_points.dart';
-
 class UserModel {
-  final String name;
-  final String phone;
-  final String email;
-  final String role;
-  final String image;
+  final String? id;
+  final String? name;
+  final String? phone;
+  final String? email;
+  final String? role;
+  final String? address;
+  final String? image;
 
   UserModel({
-    required this.name,
-    required this.phone,
-    required this.email,
-    required this.role,
-    required this.image,
+    this.id,
+    this.name,
+    this.phone,
+    this.email,
+    this.role,
+    this.address,
+    this.image,
   });
-  factory UserModel.fromJson(Map<String, dynamic> jsonData) {
+
+  factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      email: jsonData[ApiKey.email],
-      name: jsonData[ApiKey.name],
-      phone: jsonData[ApiKey.phone],
-      role: jsonData[ApiKey.role],
-      image: jsonData[ApiKey.image],
+      id: json['_id'] ?? json['id'],
+      name: json['name'],
+      phone: json['phone'],
+      email: json['email'],
+      role: json['role'],
+      address: json['address'],
+      image: json['image'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'name': name,
+      'phone': phone,
+      'email': email,
+      'role': role,
+      'address': address,
+      'image': image,
+    };
   }
 }
