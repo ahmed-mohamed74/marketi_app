@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:marketi_app/core/themes/colors.dart';
-import 'package:marketi_app/core/themes/styles.dart';
+import 'package:marketi_app/features/home_feature/views/screens/home_pages/cart_content.dart';
 import 'package:marketi_app/features/home_feature/views/screens/home_pages/home_content_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -12,39 +12,21 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int currentIndex = 0;
-  final List<Widget> pages = [
-    const HomeContent(),
-    const Center(child: Text('Cart Page')),
-    const Center(child: Text('Favourites Page')),
-    const Center(child: Text('Menu Page')),
+
+  final List<Widget> pages = const [
+    HomeScreen(),
+    CartScreen(),
+    // favourites screen,
+    Scaffold(),
+    // MenuScreen(),
+    Scaffold(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.all(5.0),
-          child: CircleAvatar(
-            backgroundColor: AppColors.lightBlueColor,
-            foregroundColor: AppColors.navyColor,
-            child: const Icon(Icons.person_2_outlined, size: 30),
-          ),
-        ),
-        title: Text('Hi User !', style: AppTextStyles.appBarTitle1),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Icon(
-              Icons.notifications_active_outlined,
-              color: AppColors.primaryColor,
-              size: 30,
-            ),
-          ),
-        ],
-      ),
-
       body: pages[currentIndex],
+
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         selectedItemColor: AppColors.primaryColor,
@@ -64,14 +46,10 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.shopping_cart_outlined),
             label: 'Cart',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Fav',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Fav'),
           BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
         ],
       ),
     );
   }
 }
-

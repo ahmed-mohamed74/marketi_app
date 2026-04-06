@@ -44,14 +44,29 @@ class ProductsSectionWidget extends StatelessWidget {
                         child: Stack(
                           children: [
                             ClipRRect(
-                              borderRadius: BorderRadius.circular(5), // ✅ fixed
-                              child: Image.asset(
-                                popularProducts[index].productImage ??
-                                    'assets/images/product2_image.png',
-                                width: double.infinity,
-                                height: double.infinity,
-                                fit: BoxFit.contain,
-                              ),
+                              borderRadius: BorderRadius.circular(5),
+                              child:
+                                  popularProducts[index].images?.first != null
+                                  ? Image.network(
+                                      popularProducts[index].images!.first,
+                                      errorBuilder:
+                                          (
+                                            context,
+                                            error,
+                                            stackTrace,
+                                          ) => Image.asset(
+                                            'assets/images/product2_image.png',
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                            fit: BoxFit.contain,
+                                          ),
+                                    )
+                                  : Image.asset(
+                                      'assets/images/product2_image.png',
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      fit: BoxFit.contain,
+                                    ),
                             ),
 
                             Positioned(
@@ -74,20 +89,20 @@ class ProductsSectionWidget extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            popularProducts[index].price ?? '499 LE',
+                            '${popularProducts[index].price?.toString()} LE',
                             style: AppTextStyles.bodySmall,
                           ),
                           Spacer(),
                           const Icon(Icons.star_border, size: 14),
                           const SizedBox(width: 2),
                           Text(
-                            popularProducts[index].rate ?? '4.9',
+                            popularProducts[index].rating?.toString() ?? '0.0',
                             style: AppTextStyles.bodySmall,
                           ),
                         ],
                       ),
                       Text(
-                        popularProducts[index].productName ?? 'Smart Watch',
+                        popularProducts[index].title ?? 'Product Name',
                         style: AppTextStyles.bodySmall,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,

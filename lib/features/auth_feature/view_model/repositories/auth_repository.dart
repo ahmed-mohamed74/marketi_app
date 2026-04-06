@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dartz/dartz.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:marketi_app/core/services/api/api_consumer.dart';
@@ -5,11 +7,12 @@ import 'package:marketi_app/core/services/api/end_points.dart';
 import 'package:marketi_app/core/services/api/errors/server_exceptions.dart';
 import 'package:marketi_app/core/services/cache/cache_helper.dart';
 import 'package:marketi_app/features/auth_feature/view_model/models/sign_in_model.dart';
+import 'package:marketi_app/features/auth_feature/view_model/models/user_model.dart';
 
 class AuthRepository {
   final ApiConsumer api;
   AuthRepository({required this.api});
-  Future<Either<String, SignInModel>> signIn({
+  Future<Either<String, UserModel>> signIn({
     required String email,
     required String password,
   }) async {
@@ -18,10 +21,27 @@ class AuthRepository {
         EndPoints.signIn,
         data: {ApiKey.email: email, ApiKey.password: password},
       );
-      final user = SignInModel.fromJson(response);
-      final decodedToken = JwtDecoder.decode(user.token ?? '');
-      CacheHelper().saveData(key: ApiKey.token, value: user.token);
-      CacheHelper().saveData(key: ApiKey.id, value: decodedToken[ApiKey.id]);
+
+      final signInResponse = SignInModel.fromJson(response);
+      final decodedToken = JwtDecoder.decode(signInResponse.token ?? '');
+
+      final user = UserModel.fromJson(response[ApiKey.user]);
+
+      await CacheHelper().saveData(
+        key: ApiKey.token,
+        value: signInResponse.token,
+      );
+
+      await CacheHelper().saveData(
+        key: ApiKey.id,
+        value: decodedToken[ApiKey.id],
+      );
+
+      await CacheHelper().saveData(
+        key: ApiKey.user,
+        value: jsonEncode(user.toJson()),
+      );
+
       return Right(user);
     } on ServerException catch (e) {
       return Left(e.errModel.message!);

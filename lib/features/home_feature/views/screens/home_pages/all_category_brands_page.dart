@@ -7,7 +7,7 @@ import 'package:marketi_app/features/home_feature/view_model/models/category_mod
 import 'package:marketi_app/features/home_feature/views/widgets/search_section_widget.dart';
 
 class AllCategoryBrandsPage extends StatelessWidget {
-  final List<CategoryBrandModel> items;
+  final List<CategoryModel> items;
   final String appBarTitle;
   const AllCategoryBrandsPage({
     super.key,

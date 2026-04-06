@@ -1,55 +1,111 @@
 part of 'home_cubit.dart';
 
-@immutable
-class HomeState {
+enum RequestStatus { initial, loading, loaded, error }
+
+class HomeState extends Equatable {
   final List<ProductModel> popularProducts;
+  final List<ProductModel> allProducts;
   final List<ProductModel> bestProducts;
   final List<ProductModel> buyAgainProducts;
-  final List<CategoryBrandModel> categories;
-  final List<CategoryBrandModel> brands;
-  final bool isLoading;
+  final List<CategoryModel> categories;
+  final List<BrandModel> brands;
+
+  final RequestStatus allProductsStatus;
+  final RequestStatus popularStatus;
+  final RequestStatus bestStatus;
+  final RequestStatus buyAgainStatus;
+  final RequestStatus categoriesStatus;
+  final RequestStatus brandsStatus;
+
+  final String? allProductsError;
+  final String? popularError;
+  final String? bestError;
+  final String? buyAgainError;
+  final String? categoriesError;
+  final String? brandsError;
 
   const HomeState({
     this.popularProducts = const [],
+    this.allProducts = const [],
     this.bestProducts = const [],
     this.buyAgainProducts = const [],
     this.categories = const [],
     this.brands = const [],
-    this.isLoading = false,
+    this.popularStatus = RequestStatus.initial,
+    this.allProductsStatus = RequestStatus.initial,
+    this.bestStatus = RequestStatus.initial,
+    this.buyAgainStatus = RequestStatus.initial,
+    this.categoriesStatus = RequestStatus.initial,
+    this.brandsStatus = RequestStatus.initial,
+    this.popularError,
+    this.bestError,
+    this.buyAgainError,
+    this.categoriesError,
+    this.brandsError,
+    this.allProductsError,
   });
 
   HomeState copyWith({
     List<ProductModel>? popularProducts,
+    List<ProductModel>? allProducts,
     List<ProductModel>? bestProducts,
     List<ProductModel>? buyAgainProducts,
-    List<CategoryBrandModel>? categories,
-    List<CategoryBrandModel>? brands,
-    bool? isLoading,
+    List<CategoryModel>? categories,
+    List<BrandModel>? brands,
+    RequestStatus? allProductsStatus,
+    RequestStatus? popularStatus,
+    RequestStatus? bestStatus,
+    RequestStatus? buyAgainStatus,
+    RequestStatus? categoriesStatus,
+    RequestStatus? brandsStatus,
+    String? allProductsError,
+    String? popularError,
+    String? bestError,
+    String? buyAgainError,
+    String? categoriesError,
+    String? brandsError,
   }) {
     return HomeState(
       popularProducts: popularProducts ?? this.popularProducts,
+      allProducts: allProducts ?? this.allProducts,
       bestProducts: bestProducts ?? this.bestProducts,
       buyAgainProducts: buyAgainProducts ?? this.buyAgainProducts,
       categories: categories ?? this.categories,
       brands: brands ?? this.brands,
-      isLoading: isLoading ?? this.isLoading,
+      popularStatus: popularStatus ?? this.popularStatus,
+      allProductsStatus: allProductsStatus ?? this.allProductsStatus,
+      bestStatus: bestStatus ?? this.bestStatus,
+      buyAgainStatus: buyAgainStatus ?? this.buyAgainStatus,
+      categoriesStatus: categoriesStatus ?? this.categoriesStatus,
+      brandsStatus: brandsStatus ?? this.brandsStatus,
+      popularError: popularError ?? this.popularError,
+      allProductsError: allProductsError ?? this.allProductsError,
+      bestError: bestError ?? this.bestError,
+      buyAgainError: buyAgainError ?? this.buyAgainError,
+      categoriesError: categoriesError ?? this.categoriesError,
+      brandsError: brandsError ?? this.brandsError,
     );
   }
-}
 
-final class HomeInitial extends HomeState {}
-
-// GetPopularProducts
-final class GetProductsLoading extends HomeState {}
-
-class GetProductsSuccess extends HomeState {
-  final List<ProductModel> products;
-
-  const GetProductsSuccess({required this.products});
-}
-
-class GetProductsFailure extends HomeState {
-  final String errorMessage;
-
-  const GetProductsFailure({required this.errorMessage});
+  @override
+  List<Object?> get props => [
+    popularProducts,
+    allProducts,
+    bestProducts,
+    buyAgainProducts,
+    categories,
+    brands,
+    allProductsStatus,
+    popularStatus,
+    bestStatus,
+    buyAgainStatus,
+    categoriesStatus,
+    brandsStatus,
+    allProductsError,
+    popularError,
+    bestError,
+    buyAgainError,
+    categoriesError,
+    brandsError,
+  ];
 }

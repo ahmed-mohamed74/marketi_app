@@ -44,6 +44,7 @@ dependencies:
   google_fonts: ^8.0.2
   dartz: ^0.10.1
   carousel_slider: ^5.1.2
+  equatable: ^2.0.8
 
 dev_dependencies:
   flutter_test:

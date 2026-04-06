@@ -1,5 +1,8 @@
+import 'package:dio/dio.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/constants/app_routes.dart';
+import 'package:marketi_app/core/services/api/dio_consumer.dart';
 import 'package:marketi_app/core/services/routing/app_state_service.dart';
 import 'package:marketi_app/features/auth_feature/views/screens/reset_password_pages/congratulation_page.dart';
 import 'package:marketi_app/features/auth_feature/views/screens/login_page.dart';
@@ -9,11 +12,15 @@ import 'package:marketi_app/features/auth_feature/views/screens/sign_up_screen.d
 import 'package:marketi_app/features/auth_feature/views/screens/reset_password_pages/verification_code_page.dart';
 import 'package:marketi_app/features/home_feature/view_model/models/category_model.dart';
 import 'package:marketi_app/features/home_feature/view_model/models/product_model.dart';
+import 'package:marketi_app/features/home_feature/view_model/repositories/home_repository.dart';
+import 'package:marketi_app/features/home_feature/views/cubit/home_cubit.dart';
 import 'package:marketi_app/features/home_feature/views/screens/category_page.dart';
 import 'package:marketi_app/features/home_feature/views/screens/home_page.dart';
 import 'package:marketi_app/features/home_feature/views/screens/home_pages/all_category_brands_page.dart';
 import 'package:marketi_app/features/home_feature/views/screens/home_pages/all_products_page.dart';
 import 'package:marketi_app/features/onboarding_feature/views/screens/onbourding_screen.dart';
+import 'package:marketi_app/features/profile_feature/view_model/repositories/profile_repository.dart';
+import 'package:marketi_app/features/profile_feature/views/cubit/profile_cubit.dart';
 import 'package:marketi_app/features/profile_feature/views/screens/profile_page.dart';
 
 class AppRouterService {
@@ -78,11 +85,8 @@ class AppRouterService {
         GoRoute(
           path: AppRoutes.allProductsPage,
           builder: (context, state) {
-            final data = state.extra as Map<String, dynamic>;
-
-            final title = data['title'] as String;
-            final items = data['items'] as List<ProductModel>;
-            return AllProductsPage(appBarTitle: title, items: items);
+            final title = state.extra as String;
+            return AllProductsPage(appBarTitle: title);
           },
         ),
 
@@ -92,14 +96,21 @@ class AppRouterService {
             final data = state.extra as Map<String, dynamic>;
 
             final title = data['title'] as String;
-            final items = data['items'] as List<CategoryBrandModel>;
+            final items = data['items'] as List<CategoryModel>;
             return AllCategoryBrandsPage(appBarTitle: title, items: items);
           },
         ),
 
         GoRoute(
           path: AppRoutes.profile,
-          builder: (context, state) => const ProfilePage(),
+          builder: (context, state) => BlocProvider(
+            create: (context) => ProfileCubit(
+              profileRepository: ProfileRepository(
+                api: DioConsumer(dio: Dio()),
+              ),
+            ),
+            child: const ProfilePage(),
+          ),
         ),
       ],
 

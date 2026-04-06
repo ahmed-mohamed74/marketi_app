@@ -25,7 +25,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: appStateService),
         BlocProvider(create: (context) => OnbourdCubit(appStateService)),
         BlocProvider(
-          create: (context) => HomeCubit(homeRepository: HomeRepository()),
+          create: (context) => HomeCubit(
+            homeRepository: HomeRepository(api: DioConsumer(dio: Dio())),
+          ),
         ),
         BlocProvider(
           create: (context) => AuthBloc(
