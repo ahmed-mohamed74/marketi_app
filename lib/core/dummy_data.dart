@@ -1,6 +1,6 @@
-import 'package:marketi_app/features/home_feature/view_model/models/brand_model.dart';
-import 'package:marketi_app/features/home_feature/view_model/models/category_model.dart';
-import 'package:marketi_app/features/home_feature/view_model/models/product_model.dart';
+import 'package:marketi_app/features/home_feature/data/models/brand_model.dart';
+import 'package:marketi_app/features/home_feature/data/models/category_model.dart';
+import 'package:marketi_app/features/home_feature/data/models/product_model.dart';
 
 class DummyData {
   static List<ProductModel> products = [
