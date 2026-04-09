@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:marketi_app/core/services/service_locator.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/features/home_feature/presentation/screens/home_pages/cart_content.dart';
 import 'package:marketi_app/features/home_feature/presentation/screens/home_pages/home_content_page.dart';
+import 'package:marketi_app/features/profile_feature/presentation/cubit/profile_cubit.dart';
+import 'package:marketi_app/features/profile_feature/presentation/screens/profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,13 +17,16 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int currentIndex = 0;
 
-  final List<Widget> pages = const [
+  final List<Widget> pages = [
     HomeScreen(),
     CartScreen(),
     // favourites screen,
     Scaffold(),
     // MenuScreen(),
-    Scaffold(),
+    BlocProvider(
+      create: (context) => ProfileCubit(profileRepository: serviceLocator()),
+      child: ProfilePage(),
+    ),
   ];
 
   @override
@@ -47,7 +54,10 @@ class _HomePageState extends State<HomePage> {
             label: 'Cart',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Fav'),
-          BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_2_outlined),
+            label: 'Profile',
+          ),
         ],
       ),
     );

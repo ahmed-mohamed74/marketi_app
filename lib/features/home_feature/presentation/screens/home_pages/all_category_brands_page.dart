@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/common/widgets/back_button_widget.dart';
 import 'package:marketi_app/core/routing/app_routes.dart';
@@ -6,6 +7,7 @@ import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
 import 'package:marketi_app/features/home_feature/data/models/brand_model.dart';
 import 'package:marketi_app/features/home_feature/data/models/category_model.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/home_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/widgets/search_section_widget.dart';
 
 class AllCategoryBrandsPage extends StatelessWidget {
@@ -47,8 +49,14 @@ class AllCategoryBrandsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SearchSectionWidget(
-                products: (appBarTitle == 'Category') ? [] : [],
+              BlocBuilder<HomeCubit, HomeState>(
+                builder: (context, state) {
+                  return SearchSectionWidget(
+                    products: (appBarTitle == 'Category')
+                        ? state.productsByCategory
+                        : state.productsByBrand,
+                  );
+                },
               ),
               SizedBox(height: 10),
               Text(

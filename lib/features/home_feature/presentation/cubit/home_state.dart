@@ -11,6 +11,8 @@ class HomeState extends Equatable {
   final List<ProductModel> buyAgainProducts;
   final List<CategoryModel> categories;
   final List<BrandModel> brands;
+  final List<CategoryNameModel> categoryNames;
+  final List<ProductModel> searchResults;
 
   final RequestStatus allProductsStatus;
   final RequestStatus popularStatus;
@@ -20,6 +22,8 @@ class HomeState extends Equatable {
   final RequestStatus buyAgainStatus;
   final RequestStatus categoriesStatus;
   final RequestStatus brandsStatus;
+  final RequestStatus categoryNamesStatus;
+  final RequestStatus searchStatus;
 
   final String? allProductsError;
   final String? popularError;
@@ -29,6 +33,8 @@ class HomeState extends Equatable {
   final String? buyAgainError;
   final String? categoriesError;
   final String? brandsError;
+  final String? categoryNamesError;
+  final String? searchError;
 
   const HomeState({
     this.popularProducts = const [],
@@ -39,6 +45,8 @@ class HomeState extends Equatable {
     this.buyAgainProducts = const [],
     this.categories = const [],
     this.brands = const [],
+    this.categoryNames = const [],
+    this.searchResults = const [],
     this.popularStatus = RequestStatus.initial,
     this.allProductsStatus = RequestStatus.initial,
     this.productsByCategoryStatus = RequestStatus.initial,
@@ -47,6 +55,8 @@ class HomeState extends Equatable {
     this.buyAgainStatus = RequestStatus.initial,
     this.categoriesStatus = RequestStatus.initial,
     this.brandsStatus = RequestStatus.initial,
+    this.categoryNamesStatus = RequestStatus.initial,
+    this.searchStatus = RequestStatus.initial,
     this.popularError,
     this.bestError,
     this.buyAgainError,
@@ -55,6 +65,8 @@ class HomeState extends Equatable {
     this.allProductsError,
     this.productsByCategoryError,
     this.productsByBrandError,
+    this.categoryNamesError,
+    this.searchError,
   });
 
   HomeState copyWith({
@@ -66,6 +78,8 @@ class HomeState extends Equatable {
     List<ProductModel>? buyAgainProducts,
     List<CategoryModel>? categories,
     List<BrandModel>? brands,
+    List<CategoryNameModel>? categoryNames,
+    List<ProductModel>? searchResults,
     RequestStatus? allProductsStatus,
     RequestStatus? productsByCategoryStatus,
     RequestStatus? productsByBrandStatus,
@@ -74,6 +88,8 @@ class HomeState extends Equatable {
     RequestStatus? buyAgainStatus,
     RequestStatus? categoriesStatus,
     RequestStatus? brandsStatus,
+    RequestStatus? categoryNamesStatus,
+    RequestStatus? searchStatus,
     String? allProductsError,
     String? productsByCategoryError,
     String? productsByBrandError,
@@ -82,6 +98,8 @@ class HomeState extends Equatable {
     String? buyAgainError,
     String? categoriesError,
     String? brandsError,
+    String? categoryNamesError,
+    String? searchError,
   }) {
     return HomeState(
       popularProducts: popularProducts ?? this.popularProducts,
@@ -92,6 +110,8 @@ class HomeState extends Equatable {
       buyAgainProducts: buyAgainProducts ?? this.buyAgainProducts,
       categories: categories ?? this.categories,
       brands: brands ?? this.brands,
+      categoryNames: categoryNames ?? this.categoryNames,
+      searchResults: searchResults ?? this.searchResults,
       popularStatus: popularStatus ?? this.popularStatus,
       allProductsStatus: allProductsStatus ?? this.allProductsStatus,
       productsByCategoryStatus:
@@ -102,6 +122,8 @@ class HomeState extends Equatable {
       buyAgainStatus: buyAgainStatus ?? this.buyAgainStatus,
       categoriesStatus: categoriesStatus ?? this.categoriesStatus,
       brandsStatus: brandsStatus ?? this.brandsStatus,
+      categoryNamesStatus: categoryNamesStatus ?? this.categoryNamesStatus,
+      searchStatus: searchStatus ?? this.searchStatus,
       popularError: popularError ?? this.popularError,
       allProductsError: allProductsError ?? this.allProductsError,
       productsByCategoryError:
@@ -111,6 +133,8 @@ class HomeState extends Equatable {
       buyAgainError: buyAgainError ?? this.buyAgainError,
       categoriesError: categoriesError ?? this.categoriesError,
       brandsError: brandsError ?? this.brandsError,
+      categoryNamesError: categoryNamesError ?? this.categoryNamesError,
+      searchError: searchError ?? this.searchError,
     );
   }
 
@@ -124,6 +148,8 @@ class HomeState extends Equatable {
     buyAgainProducts,
     categories,
     brands,
+    categoryNames,
+    searchResults,
     allProductsStatus,
     productsByCategoryStatus,
     productsByBrandStatus,
@@ -132,6 +158,8 @@ class HomeState extends Equatable {
     buyAgainStatus,
     categoriesStatus,
     brandsStatus,
+    categoryNamesStatus,
+    searchStatus,
     allProductsError,
     productsByCategoryError,
     productsByBrandError,
@@ -140,5 +168,7 @@ class HomeState extends Equatable {
     buyAgainError,
     categoriesError,
     brandsError,
+    categoryNamesError,
+    searchError,
   ];
 }

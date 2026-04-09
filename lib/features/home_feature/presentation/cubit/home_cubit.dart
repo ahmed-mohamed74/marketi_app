@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:marketi_app/features/home_feature/data/models/brand_model.dart';
 import 'package:marketi_app/features/home_feature/data/models/category_model.dart';
+import 'package:marketi_app/features/home_feature/data/models/category_name_model.dart';
 import 'package:marketi_app/features/home_feature/data/models/product_model.dart';
 import 'package:marketi_app/features/home_feature/data/repositories/home_repository.dart';
 
@@ -173,6 +174,51 @@ class HomeCubit extends Cubit<HomeState> {
         state.copyWith(
           productsByBrandStatus: RequestStatus.loaded,
           productsByBrand: products,
+        ),
+      ),
+    );
+  }
+
+  Future<void> getCategoryNames() async {
+    emit(state.copyWith(categoryNamesStatus: RequestStatus.loading));
+    final response = await homeRepository.getCategoryNames();
+    response.fold(
+      (error) => emit(
+        state.copyWith(
+          categoryNamesStatus: RequestStatus.error,
+          categoryNamesError: error,
+        ),
+      ),
+      (categories) => emit(
+        state.copyWith(
+          categoryNamesStatus: RequestStatus.loaded,
+          categoryNames: categories,
+        ),
+      ),
+    );
+  }
+
+  Future<void> getFilteredProducts({
+    required String search,
+    String category = 'All',
+    String priceSort = 'up',
+  }) async {
+    emit(state.copyWith(searchStatus: RequestStatus.loading));
+
+    final response = await homeRepository.getFilteredProducts(
+      priceSort: priceSort,
+      search: search,
+      category: category == 'All' ? '' : category,
+    );
+
+    response.fold(
+      (error) => emit(
+        state.copyWith(searchStatus: RequestStatus.error, searchError: error),
+      ),
+      (products) => emit(
+        state.copyWith(
+          searchStatus: RequestStatus.loaded,
+          searchResults: products,
         ),
       ),
     );

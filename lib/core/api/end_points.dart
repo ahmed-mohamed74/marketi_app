@@ -16,6 +16,9 @@ class EndPoints {
   static String getProductsByBrand(String brandName){
     return  "home/products/brand/$brandName";
   }
+  static String getCategoryNames = "home/categories/names";
+  static String getSearchedData = "home/productsFilter";
+
 }
 
 class ApiKey {
