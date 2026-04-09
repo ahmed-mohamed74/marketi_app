@@ -31,7 +31,7 @@ class ProductCard extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               image: DecorationImage(
-                image: AssetImage(image),
+                image: NetworkImage(image),
                 fit: BoxFit.cover,
               ),
             ),
@@ -44,7 +44,15 @@ class ProductCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(name, style: AppTextStyles.heading3),
+                    SizedBox(
+                      width: 200,
+                      child: Text(
+                        name,
+                        style: AppTextStyles.heading3,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
                     Icon(Icons.favorite_border, color: AppColors.darkBlueColor),
                   ],
                 ),

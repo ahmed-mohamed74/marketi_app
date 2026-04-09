@@ -32,8 +32,14 @@ class CategoryBrandSectionWidget extends StatelessWidget {
               GestureDetector(
                 onTap: () {
                   isBrand
-                      ? context.push(AppRoutes.categoryPage)
-                      : context.push(AppRoutes.categoryPage); /////
+                      ? context.push(
+                          AppRoutes.brandPage,
+                          extra: brandItems[index].name,
+                        )
+                      : context.push(
+                          AppRoutes.categoryPage,
+                          extra: categoryItems[index].name,
+                        );
                 },
                 child: Padding(
                   padding: isBrand

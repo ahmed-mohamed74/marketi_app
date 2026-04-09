@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:marketi_app/core/api/end_points.dart';
 import 'package:marketi_app/core/routing/app_routes.dart';
+import 'package:marketi_app/core/services/cache/cache_helper.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/home_cubit.dart';
@@ -60,6 +64,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var userName = 'User';
+    final userString = CacheHelper().getData(key: ApiKey.user);
+
+    if (userString != null) {
+      final userMap = jsonDecode(userString);
+      userName = userMap['name'];
+
+      print('user name : ${userName}');
+    }
     return Scaffold(
       appBar: AppBar(
         leading: Padding(
@@ -70,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: const Icon(Icons.person_2_outlined, size: 30),
           ),
         ),
-        title: Text('Hi User !', style: AppTextStyles.appBarTitle1),
+        title: Text('Hi $userName !', style: AppTextStyles.appBarTitle1),
       ),
       body: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) {
@@ -119,7 +132,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             AppRoutes.allCategoryBrandsPage,
                             extra: {
                               'title': 'Category',
-                              'items': state.categories,
+                              'categoryItems': state.categories,
+                              'brandItems': state.brands,
                             },
                           );
                         },
@@ -175,7 +189,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         onPressed: () {
                           context.push(
                             AppRoutes.allCategoryBrandsPage,
-                            extra: {'title': 'Brands', 'items': state.brands},
+                            extra: {
+                              'title': 'Brands',
+                              'categoryItems': state.categories,
+                              'brandItems': state.brands,
+                            },
                           );
                         },
                       ),

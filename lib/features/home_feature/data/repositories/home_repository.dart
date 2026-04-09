@@ -10,28 +10,30 @@ import 'package:marketi_app/features/home_feature/data/models/product_model.dart
 class HomeRepository {
   final ApiConsumer api;
 
-  HomeRepository({required this.api});Future<Either<String, List<ProductModel>>> getAllProducts({
-  required int skip,
-  required int limit,
-}) async {
-  try {
-    final response = await api.get(
-      EndPoints.getAllProductsData,
-      queryParameters: {'skip': skip, 'limit': limit},
-    );
+  HomeRepository({required this.api});
+  Future<Either<String, List<ProductModel>>> getAllProducts({
+    required int skip,
+    required int limit,
+  }) async {
+    try {
+      final response = await api.get(
+        EndPoints.getAllProductsData,
+        queryParameters: {'skip': skip, 'limit': limit},
+      );
 
-    // decode response if it's a JSON string
-    final data = response is String ? jsonDecode(response) : response;
+      // decode response if it's a JSON string
+      final data = response is String ? jsonDecode(response) : response;
 
-    final products = (data['list'] as List)
-        .map((e) => ProductModel.fromJson(e))
-        .toList();
+      final products = (data['list'] as List)
+          .map((e) => ProductModel.fromJson(e))
+          .toList();
 
-    return Right(products);
-  } catch (e) {
-    return Left(e.toString());
+      return Right(products);
+    } catch (e) {
+      return Left(e.toString());
+    }
   }
-}
+
   Future<Either<String, List<ProductModel>>> getPopularProducts() async {
     try {
       final response = await api.post(
@@ -126,6 +128,44 @@ class HomeRepository {
           .map((e) => BrandModel.fromMap(e))
           .toList();
       return Right(brands);
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  Future<Either<String, List<ProductModel>>> getProductsByBrand({
+    required int skip,
+    required int limit,
+    required String brand,
+  }) async {
+    try {
+      final response = await api.get(
+        EndPoints.getProductsByBrand(brand),
+        queryParameters: {"skip": skip, "limit": limit},
+      );
+      final products = (response['list'] as List)
+          .map((e) => ProductModel.fromJson(e))
+          .toList();
+      return Right(products);
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  Future<Either<String, List<ProductModel>>> getProductsByCategory({
+    required int skip,
+    required int limit,
+    required String category,
+  }) async {
+    try {
+      final response = await api.get(
+        EndPoints.getProductsByCategory(category),
+        queryParameters: {"skip": skip, "limit": limit},
+      );
+      final products = (response['list'] as List)
+          .map((e) => ProductModel.fromJson(e))
+          .toList();
+      return Right(products);
     } catch (e) {
       return Left(e.toString());
     }

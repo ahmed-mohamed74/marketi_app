@@ -10,6 +10,12 @@ class EndPoints {
   static String getPopularProductsData = "home/productsFilter";
   static String getCategoriesData = "home/categories";
   static String getBrandsData = "home/brands";
+  static String getProductsByCategory(String categoryName){
+    return  "home/products/category/$categoryName";
+  }
+  static String getProductsByBrand(String brandName){
+    return  "home/products/brand/$brandName";
+  }
 }
 
 class ApiKey {
