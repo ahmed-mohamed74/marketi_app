@@ -9,20 +9,21 @@ import 'package:marketi_app/features/home_feature/presentation/cubit/home_cubit.
 import 'package:marketi_app/features/home_feature/presentation/widgets/product_card_widget.dart';
 import 'package:marketi_app/features/home_feature/presentation/widgets/search_section_widget.dart';
 
-class CategoryPage extends StatefulWidget {
-  final String? categoryName;
-  const CategoryPage({super.key, required this.categoryName});
+class BrandPage extends StatefulWidget {
+  final String? brandName;
+  const BrandPage({super.key, required this.brandName});
 
   @override
-  State<CategoryPage> createState() => _CategoryPageState();
+  State<BrandPage> createState() => _BrandPageState();
 }
 
-class _CategoryPageState extends State<CategoryPage> {
+class _BrandPageState extends State<BrandPage> {
   @override
   void initState() {
     super.initState();
-    context.read<HomeCubit>().getProductsByCategory(
-      widget.categoryName?? 'smartphones',
+    context.read<HomeCubit>().getProductsByBrand(
+      ////////
+      widget.brandName ?? 'Essence',
     );
   }
 
@@ -35,7 +36,7 @@ class _CategoryPageState extends State<CategoryPage> {
         leading: BackButtonWidget(onPressed: () => context.pop()),
         leadingWidth: 64,
         title: Text(
-          widget.categoryName ?? 'Electronics',
+          widget.brandName ?? 'Essence',
           style: AppTextStyles.appBarTitle1,
         ),
         actions: const [
@@ -47,21 +48,21 @@ class _CategoryPageState extends State<CategoryPage> {
       ),
       body: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) {
-          if (state.productsByCategoryStatus == RequestStatus.loading) {
+          if (state.productsByBrandStatus == RequestStatus.loading) {
             return const SizedBox(
               height: 60,
               child: Center(child: CircularProgressIndicator()),
             );
-          } else if (state.productsByCategoryStatus == RequestStatus.error) {
+          } else if (state.productsByBrandStatus == RequestStatus.error) {
             return SizedBox(
               height: 60,
               child: Center(
                 child: Text(
-                  state.productsByCategoryError ?? 'Something went wrong',
+                  state.productsByBrandError ?? 'Something went wrong',
                 ),
               ),
             );
-          } else if (state.productsByCategory.isEmpty) {
+          } else if (state.productsByBrand.isEmpty) {
             return const SizedBox(
               height: 60,
               child: Center(child: Text('No items found')),
@@ -71,12 +72,12 @@ class _CategoryPageState extends State<CategoryPage> {
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
-                SearchSectionWidget(products: state.productsByCategory),
+                SearchSectionWidget(products: state.productsByBrand),
                 SizedBox(height: 10),
                 SizedBox(
                   height: 590,
                   child: ListView.builder(
-                    itemCount: state.productsByCategory.length,
+                    itemCount: state.productsByBrand.length,
                     itemBuilder: (context, index) {
                       return Column(
                         children: [
@@ -84,25 +85,22 @@ class _CategoryPageState extends State<CategoryPage> {
                             onTap: () {
                               context.push(
                                 AppRoutes.productPage,
-                                extra: state.productsByCategory[index],
+                                extra: state.productsByBrand[index],
                               );
                             },
                             child: ProductCard(
                               image:
-                                  state
-                                      .productsByCategory[index]
-                                      .images
-                                      ?.first ??
+                                  state.productsByBrand[index].images?.first ??
                                   '',
                               price:
-                                  state.productsByCategory[index].price
+                                  state.productsByBrand[index].price
                                       ?.toString() ??
                                   '',
                               rate:
-                                  state.productsByCategory[index].rating
+                                  state.productsByBrand[index].rating
                                       ?.toString() ??
                                   '',
-                              name: state.productsByCategory[index].title ?? '',
+                              name: state.productsByBrand[index].title ?? '',
                             ),
                           ),
                           Divider(

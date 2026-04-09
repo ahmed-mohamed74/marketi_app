@@ -131,4 +131,50 @@ class HomeCubit extends Cubit<HomeState> {
       ),
     );
   }
+
+  Future<void> getProductsByCategory(String category) async {
+    emit(state.copyWith(productsByCategoryStatus: RequestStatus.loading));
+    final response = await homeRepository.getProductsByCategory(
+      skip: 0,
+      limit: 10,
+      category: category,
+    );
+    response.fold(
+      (error) => emit(
+        state.copyWith(
+          productsByCategoryStatus: RequestStatus.error,
+          productsByCategoryError: error,
+        ),
+      ),
+      (products) => emit(
+        state.copyWith(
+          productsByCategoryStatus: RequestStatus.loaded,
+          productsByCategory: products,
+        ),
+      ),
+    );
+  }
+
+  Future<void> getProductsByBrand(String brand) async {
+    emit(state.copyWith(productsByBrandStatus: RequestStatus.loading));
+    final response = await homeRepository.getProductsByBrand(
+      skip: 0,
+      limit: 10,
+      brand: brand,
+    );
+    response.fold(
+      (error) => emit(
+        state.copyWith(
+          productsByBrandStatus: RequestStatus.error,
+          productsByBrandError: error,
+        ),
+      ),
+      (products) => emit(
+        state.copyWith(
+          productsByBrandStatus: RequestStatus.loaded,
+          productsByBrand: products,
+        ),
+      ),
+    );
+  }
 }

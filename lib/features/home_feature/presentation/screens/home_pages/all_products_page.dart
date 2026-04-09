@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/common/widgets/back_button_widget.dart';
+import 'package:marketi_app/core/routing/app_routes.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/home_cubit.dart';
@@ -24,7 +25,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
   void initState() {
     super.initState();
     homeCubit = context.read<HomeCubit>();
-    homeCubit.getAllProducts(); // fetch first page
+    homeCubit.getAllProducts();
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
@@ -76,7 +77,6 @@ class _AllProductsPageState extends State<AllProductsPage> {
 
           return Column(
             children: [
-              // Search
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SearchSectionWidget(products: items),
@@ -102,7 +102,11 @@ class _AllProductsPageState extends State<AllProductsPage> {
                       return const Center(child: CircularProgressIndicator());
                     }
                     final product = items[index];
-                    return ProductCardWidget(product: product);
+                    return GestureDetector(
+                      onTap: () =>
+                          context.push(AppRoutes.productPage, extra: product),
+                      child: ProductCardWidget(product: product),
+                    );
                   },
                 ),
               ),
@@ -128,7 +132,6 @@ class ProductCardWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image
             Container(
               height: 100,
               width: double.infinity,

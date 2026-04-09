@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
+import 'package:marketi_app/features/home_feature/data/models/product_model.dart';
 
 class SearchSectionWidget extends StatelessWidget {
-  final List<dynamic> products;
+  final List<ProductModel> products;
   const SearchSectionWidget({super.key, required this.products});
 
   @override
@@ -31,7 +32,7 @@ class SearchSectionWidget extends StatelessWidget {
 }
 
 class DataSearch extends SearchDelegate<String> {
-  final List<dynamic> products;
+  final List<ProductModel> products;
   static List<String> searchHistory = [];
 
   DataSearch({
@@ -70,8 +71,7 @@ class DataSearch extends SearchDelegate<String> {
   Widget buildResults(BuildContext context) {
     final results = products
         .where(
-          (p) =>
-              (p.productName ?? '').toLowerCase().contains(query.toLowerCase()),
+          (p) => (p.title ?? '').toLowerCase().contains(query.toLowerCase()),
         )
         .toList();
 
@@ -82,7 +82,7 @@ class DataSearch extends SearchDelegate<String> {
     return ListView.builder(
       itemCount: results.length,
       itemBuilder: (context, index) {
-        return ListTile(title: Text(results[index].productName ?? ''));
+        return ListTile(title: Text(results[index].title ?? ''));
       },
     );
   }
@@ -96,9 +96,8 @@ class DataSearch extends SearchDelegate<String> {
         ? []
         : products
               .where(
-                (p) => (p.productName ?? '').toLowerCase().contains(
-                  query.toLowerCase(),
-                ),
+                (p) =>
+                    (p.title ?? '').toLowerCase().contains(query.toLowerCase()),
               )
               .toList();
 
@@ -122,7 +121,7 @@ class DataSearch extends SearchDelegate<String> {
                       AppColors.lightBlueColor.withValues(alpha: 0.5),
                     ),
                     label: Text(
-                      p.productName ?? '',
+                      p.title ?? '',
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.primaryColor,
                       ),
@@ -135,7 +134,7 @@ class DataSearch extends SearchDelegate<String> {
                       ),
                     ),
                     onPressed: () {
-                      query = p.productName ?? '';
+                      query = p.title ?? '';
                       showResults(context);
                     },
                   );
@@ -185,12 +184,12 @@ class DataSearch extends SearchDelegate<String> {
                 final product = searchList[index];
 
                 return ListTile(
-                  title: Text(product.productName ?? ''),
+                  title: Text(product.title ?? ''),
                   onTap: () {
-                    // searchHistory.remove(product.productName);
-                    searchHistory.insert(0, product.productName ?? '');
+                    // searchHistory.remove(product.title);
+                    searchHistory.insert(0, product.title ?? '');
 
-                    query = product.productName ?? '';
+                    query = product.title ?? '';
                     showResults(context);
                   },
                 );
