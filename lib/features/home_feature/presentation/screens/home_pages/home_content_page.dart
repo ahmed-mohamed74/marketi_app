@@ -70,8 +70,6 @@ class _HomeScreenState extends State<HomeScreen> {
     if (userString != null) {
       final userMap = jsonDecode(userString);
       userName = userMap['name'];
-
-      print('user name : ${userName}');
     }
     return Scaffold(
       appBar: AppBar(

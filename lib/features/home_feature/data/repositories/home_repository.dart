@@ -5,6 +5,7 @@ import 'package:marketi_app/core/api/api_consumer.dart';
 import 'package:marketi_app/core/api/end_points.dart';
 import 'package:marketi_app/features/home_feature/data/models/brand_model.dart';
 import 'package:marketi_app/features/home_feature/data/models/category_model.dart';
+import 'package:marketi_app/features/home_feature/data/models/category_name_model.dart';
 import 'package:marketi_app/features/home_feature/data/models/product_model.dart';
 
 class HomeRepository {
@@ -166,6 +167,43 @@ class HomeRepository {
           .map((e) => ProductModel.fromJson(e))
           .toList();
       return Right(products);
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  Future<Either<String, List<CategoryNameModel>>> getCategoryNames() async {
+    try {
+      final response = await api.get(EndPoints.getCategoryNames);
+      final categories = (response['list'] as List)
+          .map((e) => CategoryNameModel.fromJson(e))
+          .toList();
+      return Right(categories);
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  Future<Either<String, List<ProductModel>>> getFilteredProducts({
+    required String search,
+    required String priceSort,
+    String? category,
+  }) async {
+    try {
+      final response = await api.post(
+        EndPoints.getSearchedData,
+        data: {
+          "search": search,
+          "category": category ?? "",
+          "skip": 0,
+          "limit": 10,
+          "price": priceSort,
+        },
+      );
+      final searchedProducts = (response['list'] as List)
+          .map((e) => ProductModel.fromJson(e))
+          .toList();
+      return Right(searchedProducts);
     } catch (e) {
       return Left(e.toString());
     }
