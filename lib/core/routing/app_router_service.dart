@@ -13,7 +13,10 @@ import 'package:marketi_app/features/auth_feature/presentation/screens/reset_pas
 import 'package:marketi_app/features/home_feature/data/models/brand_model.dart';
 import 'package:marketi_app/features/home_feature/data/models/category_model.dart';
 import 'package:marketi_app/features/home_feature/data/models/product_model.dart';
-import 'package:marketi_app/features/home_feature/presentation/cubit/home_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/add_product_cubit/add_product_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/delete_product_cubit/delete_product_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/get_product_cubit/get_products_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/home_cubit/home_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/screens/brand_page.dart';
 import 'package:marketi_app/features/home_feature/presentation/screens/category_page.dart';
 import 'package:marketi_app/features/home_feature/presentation/screens/home_page.dart';
@@ -92,8 +95,25 @@ class AppRouterService {
 
         GoRoute(
           path: AppRoutes.home,
-          builder: (context, state) => BlocProvider(
-            create: (context) => HomeCubit(homeRepository: serviceLocator()),
+          builder: (context, state) => MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) =>
+                    HomeCubit(homeRepository: serviceLocator()),
+              ),
+              BlocProvider(
+                create: (context) =>
+                    AddProductCubit(cartRepository: serviceLocator()),
+              ),
+              BlocProvider(
+                create: (context) =>
+                    GetProductsCubit(cartRepository: serviceLocator()),
+              ),
+              BlocProvider(
+                create: (context) =>
+                    DeleteProductCubit(cartRepository: serviceLocator()),
+              ),
+            ],
             child: const HomePage(),
           ),
         ),
@@ -102,8 +122,17 @@ class AppRouterService {
           path: AppRoutes.productPage,
           builder: (context, state) {
             final product = state.extra as ProductModel?;
-            return BlocProvider(
-              create: (context) => HomeCubit(homeRepository: serviceLocator()),
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider(
+                  create: (context) =>
+                      HomeCubit(homeRepository: serviceLocator()),
+                ),
+                BlocProvider(
+                  create: (context) =>
+                      AddProductCubit(cartRepository: serviceLocator()),
+                ),
+              ],
               child: ProductDetailsPage(product: product),
             );
           },
@@ -111,20 +140,38 @@ class AppRouterService {
         GoRoute(
           path: AppRoutes.categoryPage,
           builder: (context, state) {
-            final categoryName=state.extra as String?;
-            return BlocProvider(
-              create: (context) => HomeCubit(homeRepository: serviceLocator()),
-              child: CategoryPage(categoryName: categoryName,),
+            final categoryName = state.extra as String?;
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider(
+                  create: (context) =>
+                      HomeCubit(homeRepository: serviceLocator()),
+                ),
+                BlocProvider(
+                  create: (context) =>
+                      AddProductCubit(cartRepository: serviceLocator()),
+                ),
+              ],
+              child: CategoryPage(categoryName: categoryName),
             );
           },
         ),
         GoRoute(
           path: AppRoutes.brandPage,
           builder: (context, state) {
-            final brandName=state.extra as String?;
-            return BlocProvider(
-              create: (context) => HomeCubit(homeRepository: serviceLocator()),
-              child: BrandPage(brandName: brandName,),
+            final brandName = state.extra as String?;
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider(
+                  create: (context) =>
+                      HomeCubit(homeRepository: serviceLocator()),
+                ),
+                BlocProvider(
+                  create: (context) =>
+                      AddProductCubit(cartRepository: serviceLocator()),
+                ),
+              ],
+              child: BrandPage(brandName: brandName),
             );
           },
         ),
@@ -132,8 +179,17 @@ class AppRouterService {
           path: AppRoutes.allProductsPage,
           builder: (context, state) {
             final title = state.extra as String;
-            return BlocProvider(
-              create: (context) => HomeCubit(homeRepository: serviceLocator()),
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider(
+                  create: (context) =>
+                      HomeCubit(homeRepository: serviceLocator()),
+                ),
+                BlocProvider(
+                  create: (context) =>
+                      AddProductCubit(cartRepository: serviceLocator()),
+                ),
+              ],
               child: AllProductsPage(appBarTitle: title),
             );
           },

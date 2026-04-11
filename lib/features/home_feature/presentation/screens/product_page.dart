@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/common/widgets/back_button_widget.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
 import 'package:marketi_app/features/home_feature/data/models/product_model.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/add_product_cubit/add_product_cubit.dart';
 
 class ProductDetailsPage extends StatelessWidget {
   final ProductModel? product;
@@ -27,120 +29,134 @@ class ProductDetailsPage extends StatelessWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Main Product Image
-            Center(
-              child: Image.network(
-                product?.images?.first ??
-                    'https://placehold.co/300x300.png?text=Pampers+Box', // Replace with your asset
-                height: 250,
+      body: BlocListener<AddProductCubit, AddProductState>(
+        listener: (context, state) {
+          if (state is AddCartProductSuccess) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
+          } else if (state is AddCartProductFailure) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
+          }
+        },
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Main Product Image
+              Center(
+                child: Image.network(
+                  product?.images?.first ??
+                      'https://placehold.co/300x300.png?text=Pampers+Box', // Replace with your asset
+                  height: 250,
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            // Pagination Dots
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildDot(isActive: false),
-                _buildDot(isActive: true, width: 25),
-                _buildDot(isActive: false),
-              ],
-            ),
-            const SizedBox(height: 20),
-            // Thumbnails
-            Center(
-              child: SizedBox(
-                height: 60,
-                child: ListView(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  children: List.generate(
-                    product?.images?.length ?? 1,
-                    (index) => _buildThumbnail(image: product?.images?[index]),
+              const SizedBox(height: 10),
+              // Pagination Dots
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildDot(isActive: false),
+                  _buildDot(isActive: true, width: 25),
+                  _buildDot(isActive: false),
+                ],
+              ),
+              const SizedBox(height: 20),
+              // Thumbnails
+              Center(
+                child: SizedBox(
+                  height: 60,
+                  child: ListView(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    children: List.generate(
+                      product?.images?.length ?? 1,
+                      (index) =>
+                          _buildThumbnail(image: product?.images?[index]),
+                    ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _Badge(text: 'Free Shipping'),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.star,
-                            color: AppColors.darkBlueColor,
-                            size: 18,
-                          ),
-                          Icon(
-                            Icons.star,
-                            color: AppColors.darkBlueColor,
-                            size: 18,
-                          ),
-                          Icon(
-                            Icons.star,
-                            color: AppColors.darkBlueColor,
-                            size: 18,
-                          ),
-                          Icon(
-                            Icons.star,
-                            color: AppColors.darkBlueColor,
-                            size: 18,
-                          ),
-                          Icon(
-                            Icons.star_border,
-                            color: AppColors.darkBlueColor,
-                            size: 18,
-                          ),
-                          Text(' (4.0)', style: AppTextStyles.bodySmall),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    product?.title ?? 'Pampers Swaddlers',
-                    style: AppTextStyles.appBarTitle1,
-                  ),
-                  SizedBox(height: 8),
-                  Text('Product Value', style: AppTextStyles.heading3),
-                  SizedBox(height: 8),
-                  Text(
-                    product?.description ??
-                        'Fear no leaks with new and improved Pampers Swaddlers. Pampers Swaddlers helps prevent up to 100% of leaks, even blowouts Plus...',
-                    style: AppTextStyles.bodySmall,
-                  ),
-                  Text(
-                    'See more',
-                    style: TextStyle(
-                      color: AppColors.primaryColor,
-                      decoration: TextDecoration.underline,
-                      decorationColor: AppColors.primaryColor,
+              Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _Badge(text: 'Free Shipping'),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.star,
+                              color: AppColors.darkBlueColor,
+                              size: 18,
+                            ),
+                            Icon(
+                              Icons.star,
+                              color: AppColors.darkBlueColor,
+                              size: 18,
+                            ),
+                            Icon(
+                              Icons.star,
+                              color: AppColors.darkBlueColor,
+                              size: 18,
+                            ),
+                            Icon(
+                              Icons.star,
+                              color: AppColors.darkBlueColor,
+                              size: 18,
+                            ),
+                            Icon(
+                              Icons.star_border,
+                              color: AppColors.darkBlueColor,
+                              size: 18,
+                            ),
+                            Text(' (4.0)', style: AppTextStyles.bodySmall),
+                          ],
+                        ),
+                      ],
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  Text('Select Size', style: AppTextStyles.heading3),
-                  SizedBox(height: 10),
-                  Row(
-                    children: [
-                      _SizeOption(label: '3'),
-                      _SizeOption(label: '2', isSelected: true),
-                      _SizeOption(label: '4'),
-                    ],
-                  ),
-                ],
+                    SizedBox(height: 8),
+                    Text(
+                      product?.title ?? 'Pampers Swaddlers',
+                      style: AppTextStyles.appBarTitle1,
+                    ),
+                    SizedBox(height: 8),
+                    Text('Product Value', style: AppTextStyles.heading3),
+                    SizedBox(height: 8),
+                    Text(
+                      product?.description ??
+                          'Fear no leaks with new and improved Pampers Swaddlers. Pampers Swaddlers helps prevent up to 100% of leaks, even blowouts Plus...',
+                      style: AppTextStyles.bodySmall,
+                    ),
+                    Text(
+                      'See more',
+                      style: TextStyle(
+                        color: AppColors.primaryColor,
+                        decoration: TextDecoration.underline,
+                        decorationColor: AppColors.primaryColor,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Text('Select Size', style: AppTextStyles.heading3),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        _SizeOption(label: '3'),
+                        _SizeOption(label: '2', isSelected: true),
+                        _SizeOption(label: '4'),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: Container(
@@ -164,7 +180,11 @@ class ProductDetailsPage extends StatelessWidget {
             const SizedBox(width: 20),
             Expanded(
               child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  context.read<AddProductCubit>().addCartProduct(
+                    id: product?.id.toString() ?? '0',
+                  );
+                },
                 icon: const Icon(Icons.shopping_cart_outlined),
                 label: Text(
                   'Add to Cart',
