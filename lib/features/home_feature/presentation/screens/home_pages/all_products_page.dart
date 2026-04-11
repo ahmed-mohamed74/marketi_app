@@ -6,9 +6,12 @@ import 'package:marketi_app/core/routing/app_routes.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/add_product_cubit/add_product_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/add_favourite_cubit/add_favourite_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/delete_favourite_cubit/delete_favourite_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/get_favourites_cubit/get_favourites_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/home_cubit/home_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/widgets/product_card_widget.dart';
 import 'package:marketi_app/features/home_feature/presentation/widgets/search_section_widget.dart';
-import 'package:marketi_app/features/home_feature/data/models/product_model.dart';
 
 class AllProductsPage extends StatefulWidget {
   final String appBarTitle;
@@ -27,6 +30,7 @@ class _AllProductsPageState extends State<AllProductsPage> {
     super.initState();
     homeCubit = context.read<HomeCubit>();
     homeCubit.getAllProducts();
+    context.read<GetFavouriteCubit>().getFavouriteProducts();
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
@@ -63,174 +67,119 @@ class _AllProductsPageState extends State<AllProductsPage> {
           ),
         ],
       ),
-      body: BlocListener<AddProductCubit, AddProductState>(
-        listener: (context, state) {
-          if (state is AddCartProductSuccess) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
-          }
-        },
-        child: BlocBuilder<HomeCubit, HomeState>(
-          builder: (context, state) {
-            final items = state.allProducts;
+      body: MultiBlocListener(
+        listeners: [
+          BlocListener<AddProductCubit, AddProductState>(
+            listener: (context, state) {
+              if (state is AddCartProductSuccess) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(state.message)));
+              }
+            },
+          ),
+          BlocListener<AddFavouriteCubit, AddFavouriteState>(
+            listener: (context, state) {
+              if (state is AddFavouriteProductSuccess) {
+                context.read<GetFavouriteCubit>().getFavouriteProducts();
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(state.message)));
+              }
+            },
+          ),
+          BlocListener<DeleteFavouriteCubit, DeleteFavouriteState>(
+            listener: (context, state) {
+              if (state is DeleteFavouriteProductSuccess) {
+                context.read<GetFavouriteCubit>().getFavouriteProducts();
 
-            if (state.allProductsStatus == RequestStatus.loading &&
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Removed from favorites")),
+                );
+              } else if (state is DeleteFavouriteProductFailure) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text("Failed to remove")));
+              }
+            },
+          ),
+        ],
+        child: BlocBuilder<HomeCubit, HomeState>(
+          builder: (context, homeState) {
+            final items = homeState.allProducts;
+
+            if (homeState.allProductsStatus == RequestStatus.loading &&
                 items.isEmpty) {
               return const Center(child: CircularProgressIndicator());
             }
 
-            if (state.allProductsStatus == RequestStatus.error &&
+            if (homeState.allProductsStatus == RequestStatus.error &&
                 items.isEmpty) {
-              return Center(child: Text(state.allProductsError ?? 'Error'));
+              return Center(child: Text(homeState.allProductsError ?? 'Error'));
             }
 
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SearchSectionWidget(products: items),
-                ),
-                const SizedBox(height: 8),
-                Expanded(
-                  child: GridView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.all(8),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 0.86,
-                          mainAxisSpacing: 8,
-                          crossAxisSpacing: 8,
-                        ),
-                    itemCount:
-                        items.length +
-                        (state.allProductsStatus == RequestStatus.loading
-                            ? 2
-                            : 0),
-                    itemBuilder: (context, index) {
-                      if (index >= items.length) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      final product = items[index];
-                      return GestureDetector(
-                        onTap: () =>
-                            context.push(AppRoutes.productPage, extra: product),
-                        child: ProductCardWidget(product: product),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-// Extracted product card widget
-class ProductCardWidget extends StatelessWidget {
-  final ProductModel product;
-  const ProductCardWidget({super.key, required this.product});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Padding(
-        padding: const EdgeInsets.all(6),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 100,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: AppColors.lightBlueColor,
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(5),
-                    child: product.images?.isNotEmpty == true
-                        ? Image.network(
-                            product.images!.first,
-                            fit: BoxFit.cover,
-                          )
-                        : Image.asset(
-                            'assets/images/product2_image.png',
-                            width: double.infinity,
-                            height: double.infinity,
-                            fit: BoxFit.contain,
-                          ),
-                  ),
-                  Positioned(
-                    top: 4,
-                    right: 4,
-                    child: CircleAvatar(
-                      backgroundColor: Colors.white,
-                      radius: 15,
-                      child: Icon(
-                        Icons.favorite_border_outlined,
-                        color: AppColors.darkBlueColor,
-                        size: 18,
+            return BlocBuilder<GetFavouriteCubit, GetFavouriteState>(
+              builder: (context, favState) {
+                final items = homeState.allProducts;
+                List<int> favIds = [];
+                if (favState is GetFavouritesProductsSuccess) {
+                  favIds = favState.favouriteProducts
+                      .map((p) => p.id!)
+                      .toList();
+                }
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SearchSectionWidget(products: items),
+                    ),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      child: GridView.builder(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.all(8),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 0.86,
+                              mainAxisSpacing: 8,
+                              crossAxisSpacing: 8,
+                            ),
+                        itemCount:
+                            items.length +
+                            (homeState.allProductsStatus ==
+                                    RequestStatus.loading
+                                ? 2
+                                : 0),
+                        itemBuilder: (context, index) {
+                          if (index >= items.length) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          final product = items[index];
+                          final bool isProductInFav = favIds.contains(
+                            product.id,
+                          );
+                          return GestureDetector(
+                            onTap: () => context.push(
+                              AppRoutes.productPage,
+                              extra: product,
+                            ),
+                            child: ProductCardWidget(
+                              product: product,
+                              isFavourite:
+                                  isProductInFav, // Pass the calculated status
+                            ),
+                          );
+                        },
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Text(
-                  '${product.price ?? 499} LE',
-                  style: AppTextStyles.bodySmall,
-                ),
-                const Spacer(),
-                const Icon(Icons.star_border, size: 14),
-                const SizedBox(width: 2),
-                Text(
-                  '${product.rating ?? 4.9}',
-                  style: AppTextStyles.bodySmall,
-                ),
-              ],
-            ),
-            Text(
-              product.title ?? 'Smart Watch',
-              style: AppTextStyles.bodySmall,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-            const SizedBox(height: 4),
-            SizedBox(
-              width: double.infinity,
-              height: 30,
-              child: OutlinedButton(
-                onPressed: () {
-                  context.read<AddProductCubit>().addCartProduct(
-                    id: product.id.toString(),
-                  );
-                },
-                style: OutlinedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  side: const BorderSide(color: AppColors.primaryColor),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                child: Text(
-                  'Add',
-                  style: AppTextStyles.heading3.copyWith(
-                    color: AppColors.primaryColor,
-                  ),
-                ),
-              ),
-            ),
-          ],
+                  ],
+                );
+              },
+            );
+          },
         ),
       ),
     );

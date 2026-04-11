@@ -9,6 +9,8 @@ import 'package:marketi_app/core/services/cache/cache_helper.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/add_product_cubit/add_product_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/add_favourite_cubit/add_favourite_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/get_favourites_cubit/get_favourites_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/home_cubit/home_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/widgets/carousel_slider_widget.dart';
 import 'package:marketi_app/features/home_feature/presentation/widgets/category_section_widget.dart';
@@ -33,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
     cubit.getBuyAgainProducts();
     cubit.getCategories();
     cubit.getBrands();
+    context.read<GetFavouriteCubit>().getFavouriteProducts();
   }
 
   Widget _buildSection<T>({
@@ -89,14 +92,36 @@ class _HomeScreenState extends State<HomeScreen> {
           return Padding(
             padding: const EdgeInsets.all(14),
             child: SingleChildScrollView(
-              child: BlocListener<AddProductCubit, AddProductState>(
-                listener: (context, state) {
-                  if (state is AddCartProductSuccess) {
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(SnackBar(content: Text(state.message)));
-                  }
-                },
+              child: MultiBlocListener(
+                listeners: [
+                  BlocListener<AddProductCubit, AddProductState>(
+                    listener: (context, state) {
+                      if (state is AddCartProductSuccess) {
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text(state.message)));
+                      }
+                    },
+                  ),
+                  BlocListener<AddFavouriteCubit, AddFavouriteState>(
+                    listener: (context, state) {
+                      if (state is AddFavouriteProductSuccess) {
+                        context
+                            .read<GetFavouriteCubit>()
+                            .getFavouriteProducts();
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(state.message),
+                            duration: const Duration(
+                              milliseconds: 700,
+                            ), // Shorter duration for better feel
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ],
                 child: Column(
                   children: [
                     SearchSectionWidget(products: state.bestProducts),

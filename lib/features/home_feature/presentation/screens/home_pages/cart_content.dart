@@ -5,7 +5,10 @@ import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/delete_product_cubit/delete_product_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/get_product_cubit/get_products_cubit.dart';
-import 'package:marketi_app/features/home_feature/presentation/widgets/product_card_widget.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/add_favourite_cubit/add_favourite_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/delete_favourite_cubit/delete_favourite_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/get_favourites_cubit/get_favourites_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/widgets/product_card_with_details_widget.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -19,6 +22,7 @@ class _CartScreenState extends State<CartScreen> {
   void initState() {
     super.initState();
     context.read<GetProductsCubit>().getCartProducts();
+    context.read<GetFavouriteCubit>().getFavouriteProducts();
   }
 
   @override
@@ -41,20 +45,49 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ],
       ),
-      body: BlocListener<DeleteProductCubit, DeleteProductState>(
-        listener: (context, state) {
-          if (state is DeleteCartProductSuccess) {
-            context.read<GetProductsCubit>().getCartProducts();
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
-          }
-          if (state is DeleteCartProductFailure) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
-          }
-        },
+      body: MultiBlocListener(
+        listeners: [
+          BlocListener<DeleteProductCubit, DeleteProductState>(
+            listener: (context, state) {
+              if (state is DeleteCartProductSuccess) {
+                context.read<GetProductsCubit>().getCartProducts();
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(state.message)));
+              }
+              if (state is DeleteCartProductFailure) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(state.errorMessage)));
+              }
+            },
+          ),
+          BlocListener<AddFavouriteCubit, AddFavouriteState>(
+            listener: (context, state) {
+              if (state is AddFavouriteProductSuccess) {
+                context.read<GetFavouriteCubit>().getFavouriteProducts();
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(state.message)));
+              }
+            },
+          ),
+          BlocListener<DeleteFavouriteCubit, DeleteFavouriteState>(
+            listener: (context, state) {
+              if (state is DeleteFavouriteProductSuccess) {
+                context.read<GetFavouriteCubit>().getFavouriteProducts();
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Removed from favorites")),
+                );
+              } else if (state is DeleteFavouriteProductFailure) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text("Failed to remove")));
+              }
+            },
+          ),
+        ],
         child: BlocBuilder<GetProductsCubit, GetProductsState>(
           builder: (context, state) {
             if (state is GetCartProductsLoading) {
@@ -82,57 +115,72 @@ class _CartScreenState extends State<CartScreen> {
                   ),
                 );
               }
-              return SingleChildScrollView(
-                physics: NeverScrollableScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 14),
-                      Text('Products on Cart', style: AppTextStyles.heading1),
-                      SizedBox(height: 10),
-                      SingleChildScrollView(
-                        child: SizedBox(
-                          height: screenHeight * 0.75,
-                          child: ListView.builder(
-                            itemCount: state.cartProducts.length,
-                            itemBuilder: (context, index) {
-                              return Column(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(15),
-                                      border: Border.all(
-                                        color: AppColors.lightBlueColor
-                                            .withValues(alpha: 0.3),
-                                      ),
-                                    ),
-                                    child: ProductCard(
-                                      image: state
-                                          .cartProducts[index]
-                                          .images
-                                          ?.first,
-                                      price: state.cartProducts[index].price
-                                          .toString(),
-                                      rate: state.cartProducts[index].rating
-                                          .toString(),
-                                      name: state.cartProducts[index].title,
-                                      inCart: true,
-                                      id: state.cartProducts[index].id
-                                          .toString(),
-                                    ),
-                                  ),
-                                  SizedBox(height: 14),
-                                ],
-                              );
-                            },
+              return BlocBuilder<GetFavouriteCubit, GetFavouriteState>(
+                builder: (context, favState) {
+                  List<int> favIds = [];
+                  if (favState is GetFavouritesProductsSuccess) {
+                    favIds = favState.favouriteProducts
+                        .map((p) => p.id!)
+                        .toList();
+                  }
+                  return SingleChildScrollView(
+                    physics: NeverScrollableScrollPhysics(),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 14),
+                          Text(
+                            'Products on Cart',
+                            style: AppTextStyles.heading1,
                           ),
-                        ),
+                          SizedBox(height: 10),
+                          SingleChildScrollView(
+                            child: SizedBox(
+                              height: screenHeight * 0.75,
+                              child: ListView.builder(
+                                itemCount: state.cartProducts.length,
+                                itemBuilder: (context, index) {
+                                  final product = state.cartProducts[index];
+                                  final bool isProductInFav = favIds.contains(
+                                    product.id,
+                                  );
+                                  return Column(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(
+                                            15,
+                                          ),
+                                          border: Border.all(
+                                            color: AppColors.lightBlueColor
+                                                .withValues(alpha: 0.3),
+                                          ),
+                                        ),
+                                        child: ProductCardWithDetails(
+                                          image: product.images?.first,
+                                          price: product.price.toString(),
+                                          rate: product.rating.toString(),
+                                          name: product.title,
+                                          inCart: true,
+                                          id: product.id.toString(),
+                                          isFavourite:
+                                              isProductInFav, // 🔄 Pass the boolean here
+                                        ),
+                                      ),
+                                      SizedBox(height: 14),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               );
             } else {
               return SizedBox(

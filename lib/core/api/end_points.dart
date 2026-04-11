@@ -22,6 +22,10 @@ class EndPoints {
   static String addCartProduct = "user/addCart";
   static String deleteCartProduct = "user/deleteCart";
 
+  static String getFavouriteProducts = "user/getFavorite";
+  static String addFavouriteProduct = "user/addFavorite";
+  static String deleteFavouriteProduct = "user/deleteFavorite";
+
 }
 
 class ApiKey {
