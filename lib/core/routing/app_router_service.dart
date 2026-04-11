@@ -16,6 +16,9 @@ import 'package:marketi_app/features/home_feature/data/models/product_model.dart
 import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/add_product_cubit/add_product_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/delete_product_cubit/delete_product_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/get_product_cubit/get_products_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/add_favourite_cubit/add_favourite_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/delete_favourite_cubit/delete_favourite_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/get_favourites_cubit/get_favourites_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/home_cubit/home_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/screens/brand_page.dart';
 import 'package:marketi_app/features/home_feature/presentation/screens/category_page.dart';
@@ -113,6 +116,18 @@ class AppRouterService {
                 create: (context) =>
                     DeleteProductCubit(cartRepository: serviceLocator()),
               ),
+              BlocProvider(
+                create: (context) =>
+                    AddFavouriteCubit(favouriteRepository: serviceLocator()),
+              ),
+              BlocProvider(
+                create: (context) =>
+                    DeleteFavouriteCubit(favouriteRepository: serviceLocator()),
+              ),
+              BlocProvider(
+                create: (context) =>
+                    GetFavouriteCubit(favouriteRepository: serviceLocator()),
+              ),
             ],
             child: const HomePage(),
           ),
@@ -151,6 +166,18 @@ class AppRouterService {
                   create: (context) =>
                       AddProductCubit(cartRepository: serviceLocator()),
                 ),
+                BlocProvider(
+                create: (context) =>
+                    AddFavouriteCubit(favouriteRepository: serviceLocator()),
+              ),
+              BlocProvider(
+                create: (context) =>
+                    DeleteFavouriteCubit(favouriteRepository: serviceLocator()),
+              ),
+              BlocProvider(
+                create: (context) =>
+                    GetFavouriteCubit(favouriteRepository: serviceLocator()),
+              ),
               ],
               child: CategoryPage(categoryName: categoryName),
             );
@@ -170,6 +197,18 @@ class AppRouterService {
                   create: (context) =>
                       AddProductCubit(cartRepository: serviceLocator()),
                 ),
+                BlocProvider(
+                create: (context) =>
+                    AddFavouriteCubit(favouriteRepository: serviceLocator()),
+              ),
+              BlocProvider(
+                create: (context) =>
+                    DeleteFavouriteCubit(favouriteRepository: serviceLocator()),
+              ),
+              BlocProvider(
+                create: (context) =>
+                    GetFavouriteCubit(favouriteRepository: serviceLocator()),
+              ),
               ],
               child: BrandPage(brandName: brandName),
             );
@@ -188,6 +227,19 @@ class AppRouterService {
                 BlocProvider(
                   create: (context) =>
                       AddProductCubit(cartRepository: serviceLocator()),
+                ),
+                BlocProvider(
+                  create: (context) =>
+                      AddFavouriteCubit(favouriteRepository: serviceLocator()),
+                ),
+                BlocProvider(
+                  create: (context) => DeleteFavouriteCubit(
+                    favouriteRepository: serviceLocator(),
+                  ),
+                ),
+                BlocProvider(
+                  create: (context) =>
+                      GetFavouriteCubit(favouriteRepository: serviceLocator()),
                 ),
               ],
               child: AllProductsPage(appBarTitle: title),
