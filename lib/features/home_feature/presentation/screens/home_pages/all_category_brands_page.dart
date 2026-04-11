@@ -7,7 +7,7 @@ import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
 import 'package:marketi_app/features/home_feature/data/models/brand_model.dart';
 import 'package:marketi_app/features/home_feature/data/models/category_model.dart';
-import 'package:marketi_app/features/home_feature/presentation/cubit/home_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/home_cubit/home_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/widgets/search_section_widget.dart';
 
 class AllCategoryBrandsPage extends StatelessWidget {

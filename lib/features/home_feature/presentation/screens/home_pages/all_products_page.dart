@@ -5,7 +5,8 @@ import 'package:marketi_app/core/common/widgets/back_button_widget.dart';
 import 'package:marketi_app/core/routing/app_routes.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
-import 'package:marketi_app/features/home_feature/presentation/cubit/home_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/add_product_cubit/add_product_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/home_cubit/home_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/widgets/search_section_widget.dart';
 import 'package:marketi_app/features/home_feature/data/models/product_model.dart';
 
@@ -62,57 +63,68 @@ class _AllProductsPageState extends State<AllProductsPage> {
           ),
         ],
       ),
-      body: BlocBuilder<HomeCubit, HomeState>(
-        builder: (context, state) {
-          final items = state.allProducts;
-
-          if (state.allProductsStatus == RequestStatus.loading &&
-              items.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
+      body: BlocListener<AddProductCubit, AddProductState>(
+        listener: (context, state) {
+          if (state is AddCartProductSuccess) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
           }
-
-          if (state.allProductsStatus == RequestStatus.error && items.isEmpty) {
-            return Center(child: Text(state.allProductsError ?? 'Error'));
-          }
-
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SearchSectionWidget(products: items),
-              ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: GridView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.all(8),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.86,
-                    mainAxisSpacing: 8,
-                    crossAxisSpacing: 8,
-                  ),
-                  itemCount:
-                      items.length +
-                      (state.allProductsStatus == RequestStatus.loading
-                          ? 2
-                          : 0),
-                  itemBuilder: (context, index) {
-                    if (index >= items.length) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    final product = items[index];
-                    return GestureDetector(
-                      onTap: () =>
-                          context.push(AppRoutes.productPage, extra: product),
-                      child: ProductCardWidget(product: product),
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
         },
+        child: BlocBuilder<HomeCubit, HomeState>(
+          builder: (context, state) {
+            final items = state.allProducts;
+
+            if (state.allProductsStatus == RequestStatus.loading &&
+                items.isEmpty) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (state.allProductsStatus == RequestStatus.error &&
+                items.isEmpty) {
+              return Center(child: Text(state.allProductsError ?? 'Error'));
+            }
+
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SearchSectionWidget(products: items),
+                ),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: GridView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(8),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.86,
+                          mainAxisSpacing: 8,
+                          crossAxisSpacing: 8,
+                        ),
+                    itemCount:
+                        items.length +
+                        (state.allProductsStatus == RequestStatus.loading
+                            ? 2
+                            : 0),
+                    itemBuilder: (context, index) {
+                      if (index >= items.length) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      final product = items[index];
+                      return GestureDetector(
+                        onTap: () =>
+                            context.push(AppRoutes.productPage, extra: product),
+                        child: ProductCardWidget(product: product),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -198,7 +210,11 @@ class ProductCardWidget extends StatelessWidget {
               width: double.infinity,
               height: 30,
               child: OutlinedButton(
-                onPressed: () {},
+                onPressed: () {
+                  context.read<AddProductCubit>().addCartProduct(
+                    id: product.id.toString(),
+                  );
+                },
                 style: OutlinedButton.styleFrom(
                   backgroundColor: Colors.white,
                   side: const BorderSide(color: AppColors.primaryColor),

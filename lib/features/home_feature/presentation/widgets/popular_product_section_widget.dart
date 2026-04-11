@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/routing/app_routes.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
 import 'package:marketi_app/features/home_feature/data/models/product_model.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/add_product_cubit/add_product_cubit.dart';
 
 class ProductsSectionWidget extends StatelessWidget {
   final List<ProductModel> popularProducts;
@@ -125,7 +127,11 @@ class ProductsSectionWidget extends StatelessWidget {
                             width: double.infinity,
                             height: 30,
                             child: OutlinedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                context.read<AddProductCubit>().addCartProduct(
+                                  id: popularProducts[index].id.toString(),
+                                );
+                              },
                               style: OutlinedButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 side: const BorderSide(

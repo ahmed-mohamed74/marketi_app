@@ -1,4 +1,3 @@
-import 'package:marketi_app/features/home_feature/presentation/screens/brand_page.dart';
 
 class AppRoutes {
   static const onboarding = '/onboarding';

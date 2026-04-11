@@ -18,6 +18,9 @@ class EndPoints {
   }
   static String getCategoryNames = "home/categories/names";
   static String getSearchedData = "home/productsFilter";
+  static String getCartProducts = "user/getCart";
+  static String addCartProduct = "user/addCart";
+  static String deleteCartProduct = "user/deleteCart";
 
 }
 

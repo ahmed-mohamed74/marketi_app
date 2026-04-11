@@ -4,6 +4,7 @@ import 'package:marketi_app/core/api/api_consumer.dart';
 import 'package:marketi_app/core/api/dio_consumer.dart';
 import 'package:marketi_app/core/routing/app_state_service.dart';
 import 'package:marketi_app/features/auth_feature/data/repositories/auth_repository.dart';
+import 'package:marketi_app/features/home_feature/data/repositories/cart_repository.dart';
 import 'package:marketi_app/features/home_feature/data/repositories/home_repository.dart';
 import 'package:marketi_app/features/profile_feature/data/repositories/profile_repository.dart';
 
@@ -29,5 +30,8 @@ Future<void> serviceLocatorInit() async {
   );
   serviceLocator.registerLazySingleton(
     () => ProfileRepository(api: serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton(
+    () => CartRepository(api: serviceLocator()),
   );
 }

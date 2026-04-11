@@ -1,14 +1,20 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:marketi_app/core/constants/app_sizes.dart';
 
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/add_product_cubit/add_product_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/delete_product_cubit/delete_product_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/get_product_cubit/get_products_cubit.dart';
 
 class ProductCard extends StatelessWidget {
-  final String name;
-  final String image;
-  final String price;
-  final String rate;
+  final String? id;
+  final String? name;
+  final String? image;
+  final String? price;
+  final String? rate;
   bool inCart;
   ProductCard({
     super.key,
@@ -17,6 +23,7 @@ class ProductCard extends StatelessWidget {
     required this.price,
     required this.rate,
     this.inCart = false,
+    required this.id,
   });
 
   @override
@@ -26,12 +33,14 @@ class ProductCard extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 90,
-            height: 90,
+            width: AppSizes(context: context).screenWidth * 0.22,
+            height: AppSizes(context: context).screenWidth * 0.22,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               image: DecorationImage(
-                image: NetworkImage(image),
+                image: image != null
+                    ? NetworkImage(image!)
+                    : AssetImage('assets/images/product2_image.png'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -47,7 +56,7 @@ class ProductCard extends StatelessWidget {
                     SizedBox(
                       width: 200,
                       child: Text(
-                        name,
+                        name ?? 'default',
                         style: AppTextStyles.heading3,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -87,12 +96,12 @@ class ProductCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Price: $price,00 EGP", style: AppTextStyles.heading3),
+                    Text("Price: $price EGP", style: AppTextStyles.heading3),
                     Row(
                       children: [
                         const Icon(Icons.star_border, size: 18),
                         const SizedBox(width: 2),
-                        Text(rate, style: AppTextStyles.bodySmall),
+                        Text(rate ?? '0.0', style: AppTextStyles.bodySmall),
                       ],
                     ),
                   ],
@@ -106,7 +115,11 @@ class ProductCard extends StatelessWidget {
                             backgroundColor: AppColors.lightBlueColor
                                 .withValues(alpha: 0.3),
                             child: IconButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                context
+                                    .read<DeleteProductCubit>()
+                                    .deleteCartProduct(id: id ?? '0');
+                              },
                               icon: Icon(
                                 Icons.delete_outlined,
                                 color: AppColors.darkRedColor,
@@ -136,7 +149,11 @@ class ProductCard extends StatelessWidget {
                         width: double.infinity,
                         height: 35,
                         child: OutlinedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            context.read<AddProductCubit>().addCartProduct(
+                              id: id ?? '0',
+                            );
+                          },
                           style: OutlinedButton.styleFrom(
                             side: BorderSide(color: AppColors.primaryColor),
                             shape: RoundedRectangleBorder(

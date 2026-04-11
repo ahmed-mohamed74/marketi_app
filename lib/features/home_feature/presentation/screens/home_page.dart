@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:marketi_app/core/services/service_locator.dart';
 import 'package:marketi_app/core/themes/colors.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/delete_product_cubit/delete_product_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/get_product_cubit/get_products_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/screens/home_pages/cart_content.dart';
 import 'package:marketi_app/features/home_feature/presentation/screens/home_pages/home_content_page.dart';
 import 'package:marketi_app/features/profile_feature/presentation/cubit/profile_cubit.dart';
