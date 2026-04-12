@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:marketi_app/core/common/widgets/primary_button_widget.dart';
 import 'package:marketi_app/core/constants/app_sizes.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
@@ -28,7 +29,6 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = AppSizes(context: context).screenHeight;
-    final screenWidth = AppSizes(context: context).screenWidth;
     return Scaffold(
       appBar: AppBar(
         // leading: BackButtonWidget(onPressed: () => context.pop()),
@@ -90,6 +90,7 @@ class _CartScreenState extends State<CartScreen> {
         ],
         child: BlocBuilder<GetProductsCubit, GetProductsState>(
           builder: (context, state) {
+            print("Cart UI Rebuilt with state: $state");
             if (state is GetCartProductsLoading) {
               return const SizedBox(
                 height: 60,
@@ -125,59 +126,109 @@ class _CartScreenState extends State<CartScreen> {
                   }
                   return SingleChildScrollView(
                     physics: NeverScrollableScrollPhysics(),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 14),
-                          Text(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 14),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Text(
                             'Products on Cart',
                             style: AppTextStyles.heading1,
                           ),
-                          SizedBox(height: 10),
-                          SingleChildScrollView(
-                            child: SizedBox(
-                              height: screenHeight * 0.75,
-                              child: ListView.builder(
-                                itemCount: state.cartProducts.length,
-                                itemBuilder: (context, index) {
-                                  final product = state.cartProducts[index];
-                                  final bool isProductInFav = favIds.contains(
-                                    product.id,
-                                  );
-                                  return Column(
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                            15,
+                        ),
+                        SizedBox(height: 10),
+                        Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
+                              child: SizedBox(
+                                height: screenHeight * 0.617,
+                                child: ListView.builder(
+                                  itemCount: state.cartProducts.length,
+                                  itemBuilder: (context, index) {
+                                    final product = state.cartProducts[index];
+                                    final bool isProductInFav = favIds.contains(
+                                      product.id,
+                                    );
+                                    return Column(
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(
+                                              15,
+                                            ),
+                                            border: Border.all(
+                                              color: AppColors.lightBlueColor
+                                                  .withValues(alpha: 0.3),
+                                            ),
                                           ),
-                                          border: Border.all(
-                                            color: AppColors.lightBlueColor
-                                                .withValues(alpha: 0.3),
+                                          child: ProductCardWithDetails(
+                                            image: product.images?.first,
+                                            price: product.price.toString(),
+                                            rate: product.rating.toString(),
+                                            name: product.title,
+                                            inCart: true,
+                                            id: product.id.toString(),
+                                            isFavourite: isProductInFav,
+                                            onIncrement: () => context
+                                                .read<GetProductsCubit>()
+                                                .updateQuantity(index, true),
+                                            onDecrement: () => context
+                                                .read<GetProductsCubit>()
+                                                .updateQuantity(index, false),
+                                            onDelete: () => context
+                                                .read<DeleteProductCubit>()
+                                                .deleteCartProduct(
+                                                  id: product.id.toString(),
+                                                ),
+                                            quantity: product.quantity,
                                           ),
                                         ),
-                                        child: ProductCardWithDetails(
-                                          image: product.images?.first,
-                                          price: product.price.toString(),
-                                          rate: product.rating.toString(),
-                                          name: product.title,
-                                          inCart: true,
-                                          id: product.id.toString(),
-                                          isFavourite:
-                                              isProductInFav, // 🔄 Pass the boolean here
-                                        ),
-                                      ),
-                                      SizedBox(height: 14),
-                                    ],
-                                  );
-                                },
+                                        SizedBox(height: 14),
+                                      ],
+                                    );
+                                  },
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                            Card(
+                              elevation: 1,
+                              shape: ContinuousRectangleBorder(
+                                borderRadius: BorderRadiusGeometry.circular(10),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          'Suptotal (${state.cartProducts.length} items)',
+                                          style: AppTextStyles.heading3,
+                                        ),
+                                        Text(
+                                          'EGP ${state.totalAmount.toStringAsFixed(2)}',
+                                          style: AppTextStyles.heading3,
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    PrimaryButtonWidget(
+                                      text: 'Checkout',
+                                      onPressed: () {},
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   );
                 },

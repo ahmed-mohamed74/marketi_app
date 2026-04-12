@@ -14,8 +14,11 @@ final class GetCartProductsLoading extends GetProductsState {}
 
 final class GetCartProductsSuccess extends GetProductsState {
   final List<ProductModel> cartProducts;
+  final double totalAmount;
 
-  const GetCartProductsSuccess(this.cartProducts);
+  const GetCartProductsSuccess(this.cartProducts, this.totalAmount);
+  @override
+  List<Object> get props => [cartProducts, totalAmount];
 }
 
 final class GetCartProductsFailure extends GetProductsState {

@@ -16,6 +16,10 @@ class ProductCardWithDetails extends StatelessWidget {
   final String? image;
   final String? price;
   final String? rate;
+  final int quantity;
+  final VoidCallback onIncrement;
+  final VoidCallback onDecrement;
+  final VoidCallback onDelete;
   bool inCart;
   final bool isFavourite;
   ProductCardWithDetails({
@@ -27,6 +31,10 @@ class ProductCardWithDetails extends StatelessWidget {
     this.inCart = false,
     this.isFavourite = false,
     required this.id,
+    required this.quantity,
+    required this.onIncrement,
+    required this.onDecrement,
+    required this.onDelete,
   });
 
   @override
@@ -136,19 +144,19 @@ class ProductCardWithDetails extends StatelessWidget {
                             backgroundColor: AppColors.lightBlueColor
                                 .withValues(alpha: 0.3),
                             child: IconButton(
-                              onPressed: () {
-                                context
-                                    .read<DeleteProductCubit>()
-                                    .deleteCartProduct(id: id ?? '0');
-                              },
+                              onPressed: quantity > 1 ? onDecrement : onDelete,
                               icon: Icon(
-                                Icons.delete_outlined,
-                                color: AppColors.darkRedColor,
+                                quantity > 1
+                                    ? Icons.remove
+                                    : Icons.delete_outlined,
+                                color: quantity > 1
+                                    ? AppColors.primaryColor
+                                    : AppColors.darkRedColor,
                               ),
                             ),
                           ),
                           Text(
-                            '1',
+                            '$quantity',
                             style: AppTextStyles.heading3.copyWith(
                               color: AppColors.primaryColor,
                             ),
@@ -157,7 +165,7 @@ class ProductCardWithDetails extends StatelessWidget {
                             backgroundColor: AppColors.lightBlueColor
                                 .withValues(alpha: 0.3),
                             child: IconButton(
-                              onPressed: () {},
+                              onPressed: onIncrement,
                               icon: Icon(
                                 Icons.add,
                                 color: AppColors.primaryColor,
