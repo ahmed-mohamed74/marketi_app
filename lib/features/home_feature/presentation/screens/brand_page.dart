@@ -136,7 +136,7 @@ class _BrandPageState extends State<BrandPage> {
                                     price: product.price?.toString() ?? '',
                                     rate: product.rating?.toString() ?? '',
                                     isFavourite:
-                                        isProductInFav,
+                                        isProductInFav, quantity: 1, onIncrement: () {  }, onDecrement: () {  }, onDelete: () {  },
                                   ),
                                 ),
                                   Divider(

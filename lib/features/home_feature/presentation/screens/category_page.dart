@@ -145,8 +145,11 @@ class _CategoryPageState extends State<CategoryPage> {
                                     image: product.images?.first ?? '',
                                     price: product.price?.toString() ?? '',
                                     rate: product.rating?.toString() ?? '',
-                                    isFavourite:
-                                        isProductInFav,
+                                    isFavourite: isProductInFav,
+                                    quantity: 1,
+                                    onIncrement: () {},
+                                    onDecrement: () {},
+                                    onDelete: () {},
                                   ),
                                 ),
                                 Divider(

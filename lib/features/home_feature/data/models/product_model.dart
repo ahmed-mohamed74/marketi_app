@@ -1,5 +1,8 @@
-class ProductModel {
+import 'package:equatable/equatable.dart';
+
+class ProductModel extends Equatable{
   int? id;
+  int quantity = 1;
   String? title;
   String? description;
   String? category;
@@ -24,6 +27,7 @@ class ProductModel {
 
   ProductModel({
     this.id,
+    this.quantity = 1,
     this.title,
     this.description,
     this.category,
@@ -46,7 +50,17 @@ class ProductModel {
     this.images,
     this.thumbnail,
   });
-
+ProductModel copyWith({int? quantity}) {
+    return ProductModel(
+      id: id,
+      quantity: quantity ?? this.quantity,
+      title: title,
+      price: price,
+      images: images,
+      rating: rating,
+      // Add other fields as needed
+    );
+  }
   ProductModel.fromJson(Map<String, dynamic> json) {
     id = json['id'] as int?;
     title = json['title'] ?? '';
@@ -118,6 +132,9 @@ class ProductModel {
       'thumbnail': thumbnail,
     };
   }
+  
+  @override 
+  List<Object?> get props => [id, quantity, title, price];
 }
 
 class Dimensions {
