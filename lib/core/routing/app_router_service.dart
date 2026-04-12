@@ -22,6 +22,7 @@ import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_c
 import 'package:marketi_app/features/home_feature/presentation/cubit/home_cubit/home_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/screens/brand_page.dart';
 import 'package:marketi_app/features/home_feature/presentation/screens/category_page.dart';
+import 'package:marketi_app/features/home_feature/presentation/screens/checkout_page.dart';
 import 'package:marketi_app/features/home_feature/presentation/screens/home_page.dart';
 import 'package:marketi_app/features/home_feature/presentation/screens/home_pages/all_category_brands_page.dart';
 import 'package:marketi_app/features/home_feature/presentation/screens/home_pages/all_products_page.dart';
@@ -273,6 +274,10 @@ class AppRouterService {
                 ProfileCubit(profileRepository: serviceLocator()),
             child: const ProfilePage(),
           ),
+        ),
+        GoRoute(
+          path: AppRoutes.checkoutPage,
+          builder: (context, state) => const CheckoutPage(),
         ),
       ],
 

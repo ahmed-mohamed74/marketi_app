@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/common/widgets/primary_button_widget.dart';
 import 'package:marketi_app/core/constants/app_sizes.dart';
+import 'package:marketi_app/core/routing/app_routes.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/delete_product_cubit/delete_product_cubit.dart';
@@ -220,7 +222,9 @@ class _CartScreenState extends State<CartScreen> {
                                     SizedBox(height: 10),
                                     PrimaryButtonWidget(
                                       text: 'Checkout',
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        context.push(AppRoutes.checkoutPage);
+                                      },
                                     ),
                                   ],
                                 ),
