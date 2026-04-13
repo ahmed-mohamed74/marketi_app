@@ -168,17 +168,18 @@ class AppRouterService {
                       AddProductCubit(cartRepository: serviceLocator()),
                 ),
                 BlocProvider(
-                create: (context) =>
-                    AddFavouriteCubit(favouriteRepository: serviceLocator()),
-              ),
-              BlocProvider(
-                create: (context) =>
-                    DeleteFavouriteCubit(favouriteRepository: serviceLocator()),
-              ),
-              BlocProvider(
-                create: (context) =>
-                    GetFavouriteCubit(favouriteRepository: serviceLocator()),
-              ),
+                  create: (context) =>
+                      AddFavouriteCubit(favouriteRepository: serviceLocator()),
+                ),
+                BlocProvider(
+                  create: (context) => DeleteFavouriteCubit(
+                    favouriteRepository: serviceLocator(),
+                  ),
+                ),
+                BlocProvider(
+                  create: (context) =>
+                      GetFavouriteCubit(favouriteRepository: serviceLocator()),
+                ),
               ],
               child: CategoryPage(categoryName: categoryName),
             );
@@ -199,17 +200,18 @@ class AppRouterService {
                       AddProductCubit(cartRepository: serviceLocator()),
                 ),
                 BlocProvider(
-                create: (context) =>
-                    AddFavouriteCubit(favouriteRepository: serviceLocator()),
-              ),
-              BlocProvider(
-                create: (context) =>
-                    DeleteFavouriteCubit(favouriteRepository: serviceLocator()),
-              ),
-              BlocProvider(
-                create: (context) =>
-                    GetFavouriteCubit(favouriteRepository: serviceLocator()),
-              ),
+                  create: (context) =>
+                      AddFavouriteCubit(favouriteRepository: serviceLocator()),
+                ),
+                BlocProvider(
+                  create: (context) => DeleteFavouriteCubit(
+                    favouriteRepository: serviceLocator(),
+                  ),
+                ),
+                BlocProvider(
+                  create: (context) =>
+                      GetFavouriteCubit(favouriteRepository: serviceLocator()),
+                ),
               ],
               child: BrandPage(brandName: brandName),
             );
@@ -277,7 +279,17 @@ class AppRouterService {
         ),
         GoRoute(
           path: AppRoutes.checkoutPage,
-          builder: (context, state) => const CheckoutPage(),
+          builder: (context, state) {
+            final data = state.extra as Map<String, dynamic>?;
+
+            final amount = data?['amount'] as double?;
+            final suptotalItems = data?['suptotalItems'] as int?;
+
+            return CheckoutPage(
+              amount: amount ?? 0.0,
+              suptotalItems: suptotalItems,
+            );
+          },
         ),
       ],
 

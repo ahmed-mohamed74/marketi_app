@@ -3,11 +3,18 @@ import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/common/widgets/back_button_widget.dart';
 import 'package:marketi_app/core/common/widgets/primary_button_widget.dart';
 import 'package:marketi_app/core/constants/app_sizes.dart';
+import 'package:marketi_app/core/services/payment/stripe_payment/payment_manager.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
 
 class CheckoutPage extends StatelessWidget {
-  const CheckoutPage({super.key});
+  final double? amount;
+  final int? suptotalItems;
+  const CheckoutPage({
+    super.key,
+    required this.amount,
+    required this.suptotalItems,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -55,9 +62,16 @@ class CheckoutPage extends StatelessWidget {
             const SizedBox(height: 14),
             const SectionTitle(title: 'Payment'),
             const SizedBox(height: 10),
-            const OrderSummaryCard(),
+            OrderSummaryCard(
+              suptotalItems: suptotalItems ?? 0,
+              amount: amount ?? 0,
+            ),
             const SizedBox(height: 14),
-            PrimaryButtonWidget(text: 'Place Order', onPressed: () {}),
+            PrimaryButtonWidget(
+              text: 'Place Order',
+              onPressed: () =>
+                  PaymentManager.makePayment(amount!.toInt(), "EGP"),
+            ),
           ],
         ),
       ),
@@ -147,7 +161,13 @@ class AddressCard extends StatelessWidget {
 }
 
 class OrderSummaryCard extends StatelessWidget {
-  const OrderSummaryCard({super.key});
+  final int suptotalItems;
+  final double amount;
+  const OrderSummaryCard({
+    super.key,
+    required this.suptotalItems,
+    required this.amount,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +179,10 @@ class OrderSummaryCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const SummaryRow(label: 'Suptotal (3 items)', value: 'EGP 1,120.00'),
+          SummaryRow(
+            label: 'Suptotal ($suptotalItems items)',
+            value: 'EGP $amount.00',
+          ),
           const SizedBox(height: 8),
           const SummaryRow(label: 'Delivery Fees', value: 'EGP 10.00'),
           const Padding(
@@ -171,9 +194,9 @@ class OrderSummaryCard extends StatelessWidget {
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
+            children: [
               Text('Total', style: AppTextStyles.heading3),
-              Text('EGP 1,130.00', style: AppTextStyles.heading3),
+              Text('EGP ${amount + 10}.00', style: AppTextStyles.heading3),
             ],
           ),
         ],

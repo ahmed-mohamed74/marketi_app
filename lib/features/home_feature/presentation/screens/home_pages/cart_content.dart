@@ -223,7 +223,14 @@ class _CartScreenState extends State<CartScreen> {
                                     PrimaryButtonWidget(
                                       text: 'Checkout',
                                       onPressed: () {
-                                        context.push(AppRoutes.checkoutPage);
+                                        context.push(
+                                          AppRoutes.checkoutPage,
+                                          extra: {
+                                            'amount': state.totalAmount,
+                                            'suptotalItems':
+                                                state.cartProducts.length,
+                                          },
+                                        );
                                       },
                                     ),
                                   ],

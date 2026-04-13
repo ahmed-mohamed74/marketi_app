@@ -32,6 +32,7 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+lib/core/services/payment/stripe_payment/stripe_keys.dart
 
 # Symbolication related
 app.*.symbols
