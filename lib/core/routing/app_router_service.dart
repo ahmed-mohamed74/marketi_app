@@ -20,6 +20,7 @@ import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_c
 import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/delete_favourite_cubit/delete_favourite_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/get_favourites_cubit/get_favourites_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/home_cubit/home_cubit.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/payment_cubit/payment_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/screens/brand_page.dart';
 import 'package:marketi_app/features/home_feature/presentation/screens/category_page.dart';
 import 'package:marketi_app/features/home_feature/presentation/screens/checkout_page.dart';
@@ -285,9 +286,12 @@ class AppRouterService {
             final amount = data?['amount'] as double?;
             final suptotalItems = data?['suptotalItems'] as int?;
 
-            return CheckoutPage(
-              amount: amount ?? 0.0,
-              suptotalItems: suptotalItems,
+            return BlocProvider(
+              create: (context) => PaymentCubit(),
+              child: CheckoutPage(
+                amount: amount ?? 0.0,
+                suptotalItems: suptotalItems,
+              ),
             );
           },
         ),

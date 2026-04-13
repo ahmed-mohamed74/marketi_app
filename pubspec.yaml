@@ -47,6 +47,7 @@ dependencies:
   equatable: ^2.0.8
   get_it: ^9.2.1
   flutter_stripe: ^12.6.0
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

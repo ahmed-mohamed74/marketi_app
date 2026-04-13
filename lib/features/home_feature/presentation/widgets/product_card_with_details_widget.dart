@@ -6,7 +6,6 @@ import 'package:marketi_app/core/constants/app_sizes.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/add_product_cubit/add_product_cubit.dart';
-import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/delete_product_cubit/delete_product_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/add_favourite_cubit/add_favourite_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/delete_favourite_cubit/delete_favourite_cubit.dart';
 

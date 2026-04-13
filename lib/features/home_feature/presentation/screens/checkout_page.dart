@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/common/widgets/back_button_widget.dart';
+import 'package:marketi_app/core/common/widgets/loader.dart';
 import 'package:marketi_app/core/common/widgets/primary_button_widget.dart';
 import 'package:marketi_app/core/constants/app_sizes.dart';
-import 'package:marketi_app/core/services/payment/stripe_payment/payment_manager.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
+import 'package:marketi_app/features/home_feature/presentation/cubit/payment_cubit/payment_cubit.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class CheckoutPage extends StatelessWidget {
+enum PaymentMethod { cash, card }
+
+class CheckoutPage extends StatefulWidget {
   final double? amount;
   final int? suptotalItems;
   const CheckoutPage({
@@ -16,6 +21,12 @@ class CheckoutPage extends StatelessWidget {
     required this.suptotalItems,
   });
 
+  @override
+  State<CheckoutPage> createState() => _CheckoutPageState();
+}
+
+class _CheckoutPageState extends State<CheckoutPage> {
+  PaymentMethod selectedMethod = PaymentMethod.cash;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,10 +63,15 @@ class CheckoutPage extends StatelessWidget {
             const SizedBox(height: 14),
             const SectionTitle(title: 'Payment'),
             const SizedBox(height: 10),
-            const InfoTile(
-              icon: Icons.payments_outlined,
-              text: 'Cash on delivery',
+            InfoTile(
+              icon: selectedMethod == PaymentMethod.cash
+                  ? Icons.payments_outlined
+                  : Icons.credit_card,
+              text: selectedMethod == PaymentMethod.cash
+                  ? 'Cash on delivery'
+                  : 'Credit / Debit Card',
               trailingText: 'Change',
+              onTrailingPressed: _showPaymentPicker, // Pass the function here
             ),
             const SizedBox(height: 10),
             const VoucherSection(),
@@ -63,18 +79,126 @@ class CheckoutPage extends StatelessWidget {
             const SectionTitle(title: 'Payment'),
             const SizedBox(height: 10),
             OrderSummaryCard(
-              suptotalItems: suptotalItems ?? 0,
-              amount: amount ?? 0,
+              suptotalItems: widget.suptotalItems ?? 0,
+              amount: widget.amount ?? 0,
             ),
             const SizedBox(height: 14),
-            PrimaryButtonWidget(
-              text: 'Place Order',
-              onPressed: () =>
-                  PaymentManager.makePayment(amount!.toInt(), "EGP"),
+            BlocConsumer<PaymentCubit, PaymentState>(
+              listener: (context, state) {
+                if (state is PaymentFailure) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Error!! Amount may be less than 50 cents.',
+                      ),
+                    ),
+                  );
+                }
+              },
+              builder: (context, state) {
+                if (state is PaymentLoading) {
+                  return Loader();
+                }
+                return PrimaryButtonWidget(
+                  text: selectedMethod == PaymentMethod.cash
+                      ? 'Confirm via WhatsApp'
+                      : 'Pay Now',
+                  onPressed: () {
+                    if (selectedMethod == PaymentMethod.card) {
+                      context.read<PaymentCubit>().makePayment(
+                        widget.amount!.round(),
+                        "EGP",
+                      );
+                    } else {
+                      _sendWhatsAppOrder();
+                    }
+                  },
+                );
+              },
             ),
           ],
         ),
       ),
+    );
+  }
+
+  // Function to handle WhatsApp Redirection
+  void _sendWhatsAppOrder() async {
+    const String phoneNumber = "+201098216811"; // Your company number
+    final String message =
+        "Hello Marketi! I'd like to confirm my order:\n"
+        "Total Items: ${widget.suptotalItems}\n"
+        "Total Amount: EGP ${(widget.amount! + 10).round()}\n"
+        "Payment Method: Cash on Delivery\n"
+        "Address: Anshas, Al-sharqia, Egypt.";
+
+    final Uri url = Uri.parse(
+      "whatsapp://send?phone=$phoneNumber&text=${Uri.encodeComponent(message)}",
+    );
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      // Fallback if WhatsApp is not installed
+      final Uri httpsUrl = Uri.parse(
+        "https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}",
+      );
+      await launchUrl(httpsUrl, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  void _showPaymentPicker() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Select Payment Method", style: AppTextStyles.heading2),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: const Icon(
+                  Icons.payments_outlined,
+                  color: AppColors.primaryColor,
+                ),
+                title: const Text("Cash on Delivery"),
+                trailing: selectedMethod == PaymentMethod.cash
+                    ? const Icon(
+                        Icons.check_circle,
+                        color: AppColors.primaryColor,
+                      )
+                    : null,
+                onTap: () {
+                  setState(() => selectedMethod = PaymentMethod.cash);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.credit_card,
+                  color: AppColors.primaryColor,
+                ),
+                title: const Text("Pay with Card (Stripe)"),
+                trailing: selectedMethod == PaymentMethod.card
+                    ? const Icon(
+                        Icons.check_circle,
+                        color: AppColors.primaryColor,
+                      )
+                    : null,
+                onTap: () {
+                  setState(() => selectedMethod = PaymentMethod.card);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -181,7 +305,7 @@ class OrderSummaryCard extends StatelessWidget {
         children: [
           SummaryRow(
             label: 'Suptotal ($suptotalItems items)',
-            value: 'EGP $amount.00',
+            value: 'EGP ${amount.toStringAsFixed(2)}.00',
           ),
           const SizedBox(height: 8),
           const SummaryRow(label: 'Delivery Fees', value: 'EGP 10.00'),
@@ -196,7 +320,10 @@ class OrderSummaryCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Total', style: AppTextStyles.heading3),
-              Text('EGP ${amount + 10}.00', style: AppTextStyles.heading3),
+              Text(
+                'EGP ${(amount + 10).toStringAsFixed(2)}.00',
+                style: AppTextStyles.heading3,
+              ),
             ],
           ),
         ],
@@ -219,11 +346,13 @@ class InfoTile extends StatelessWidget {
   final IconData icon;
   final String text;
   final String? trailingText;
+  final VoidCallback? onTrailingPressed;
 
   const InfoTile({
     required this.icon,
     required this.text,
     this.trailingText,
+    this.onTrailingPressed,
     super.key,
   });
 
@@ -243,7 +372,7 @@ class InfoTile extends StatelessWidget {
           const Spacer(),
           if (trailingText != null)
             TextButton(
-              onPressed: () {},
+              onPressed: onTrailingPressed, // Use the callback here
               child: Text(
                 trailingText!,
                 style: AppTextStyles.heading3.copyWith(
