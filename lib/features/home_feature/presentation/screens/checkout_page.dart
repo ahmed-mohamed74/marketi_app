@@ -5,6 +5,7 @@ import 'package:marketi_app/core/common/widgets/back_button_widget.dart';
 import 'package:marketi_app/core/common/widgets/loader.dart';
 import 'package:marketi_app/core/common/widgets/primary_button_widget.dart';
 import 'package:marketi_app/core/constants/app_sizes.dart';
+import 'package:marketi_app/core/services/payment/stripe_payment/stripe_keys.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/payment_cubit/payment_cubit.dart';
@@ -124,7 +125,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   // Function to handle WhatsApp Redirection
   void _sendWhatsAppOrder() async {
-    const String phoneNumber = "+201098216811"; // Your company number
+    const String phoneNumber =
+        StripeKeys.companyPhoneNumber; // Your company number
     final String message =
         "Hello Marketi! I'd like to confirm my order:\n"
         "Total Items: ${widget.suptotalItems}\n"

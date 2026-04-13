@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skeletonizer/skeletonizer.dart'; // Add this
 import 'package:marketi_app/core/common/widgets/back_button_widget.dart';
 import 'package:marketi_app/core/routing/app_routes.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
+import 'package:marketi_app/features/home_feature/data/models/product_model.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/add_product_cubit/add_product_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/add_favourite_cubit/add_favourite_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/delete_favourite_cubit/delete_favourite_cubit.dart';
@@ -15,7 +17,7 @@ import 'package:marketi_app/features/home_feature/presentation/widgets/search_se
 
 class CategoryPage extends StatefulWidget {
   final String? categoryName;
-  const CategoryPage({super.key, required this.categoryName});
+  const CategoryPage({super.key, this.categoryName});
 
   @override
   State<CategoryPage> createState() => _CategoryPageState();
@@ -73,41 +75,42 @@ class _CategoryPageState extends State<CategoryPage> {
             listener: (context, state) {
               if (state is DeleteFavouriteProductSuccess) {
                 context.read<GetFavouriteCubit>().getFavouriteProducts();
-
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Removed from favorites")),
+                  const SnackBar(content: Text("Removed from favorites")),
                 );
-              } else if (state is DeleteFavouriteProductFailure) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text("Failed to remove")));
               }
             },
           ),
         ],
         child: BlocBuilder<HomeCubit, HomeState>(
           builder: (context, homeState) {
-            if (homeState.productsByCategoryStatus == RequestStatus.loading) {
-              return const SizedBox(
-                height: 60,
-                child: Center(child: CircularProgressIndicator()),
-              );
-            } else if (homeState.productsByCategoryStatus ==
-                RequestStatus.error) {
-              return SizedBox(
-                height: 60,
-                child: Center(
-                  child: Text(
-                    homeState.productsByCategoryError ?? 'Something went wrong',
-                  ),
-                ),
-              );
-            } else if (homeState.productsByCategory.isEmpty) {
-              return const SizedBox(
-                height: 60,
-                child: Center(child: Text('No items found')),
+            final bool isLoading =
+                homeState.productsByCategoryStatus == RequestStatus.loading;
+            if (homeState.productsByCategoryStatus == RequestStatus.error &&
+                homeState.productsByCategory.isEmpty) {
+              return Center(
+                child: Text(homeState.productsByCategoryError ?? 'Error'),
               );
             }
+
+            // Dummy data for skeleton bones
+            final List<ProductModel> products = isLoading
+                ? List.generate(
+                    5,
+                    (index) => ProductModel(
+                      id: index,
+                      title: 'Product Name Loading',
+                      price: 0.0,
+                      rating: 0.0,
+                      images: [''],
+                    ),
+                  )
+                : homeState.productsByCategory;
+
+            if (!isLoading && products.isEmpty) {
+              return const Center(child: Text('No items found'));
+            }
+
             return BlocBuilder<GetFavouriteCubit, GetFavouriteState>(
               builder: (context, favState) {
                 List<int> favIds = [];
@@ -116,53 +119,63 @@ class _CategoryPageState extends State<CategoryPage> {
                       .map((p) => p.id!)
                       .toList();
                 }
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      SearchSectionWidget(
-                        products: homeState.productsByCategory,
-                      ),
-                      SizedBox(height: 10),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: homeState.productsByCategory.length,
-                          itemBuilder: (context, index) {
-                            final product = homeState.productsByCategory[index];
-                            final bool isProductInFav = favIds.contains(
-                              product.id,
-                            );
-                            return Column(
-                              children: [
-                                GestureDetector(
-                                  onTap: () => context.push(
-                                    AppRoutes.productPage,
-                                    extra: product,
+
+                return Skeletonizer(
+                  enabled: isLoading,
+                  ignoreContainers: true,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        SearchSectionWidget(products: products),
+                        const SizedBox(height: 10),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: products.length,
+                            itemBuilder: (context, index) {
+                              final product = products[index];
+                              final bool isProductInFav = favIds.contains(
+                                product.id,
+                              );
+
+                              return Column(
+                                children: [
+                                  GestureDetector(
+                                    onTap: isLoading
+                                        ? null
+                                        : () => context.push(
+                                            AppRoutes.productPage,
+                                            extra: product,
+                                          ),
+                                    child: ProductCardWithDetails(
+                                      id: product.id.toString(),
+                                      name: product.title ?? '',
+                                      image:
+                                          (product.images != null &&
+                                              product.images!.isNotEmpty)
+                                          ? product.images!.first
+                                          : '',
+                                      price: product.price?.toString() ?? '0.0',
+                                      rate: product.rating?.toString() ?? '0.0',
+                                      isFavourite: isProductInFav,
+                                      quantity: 1,
+                                      onIncrement: () {},
+                                      onDecrement: () {},
+                                      onDelete: () {},
+                                    ),
                                   ),
-                                  child: ProductCardWithDetails(
-                                    id: product.id.toString(),
-                                    name: product.title,
-                                    image: product.images?.first ?? '',
-                                    price: product.price?.toString() ?? '',
-                                    rate: product.rating?.toString() ?? '',
-                                    isFavourite: isProductInFav,
-                                    quantity: 1,
-                                    onIncrement: () {},
-                                    onDecrement: () {},
-                                    onDelete: () {},
+                                  Divider(
+                                    color: AppColors.greyScaleColor.withValues(
+                                      alpha: 0.2,
+                                    ),
                                   ),
-                                ),
-                                Divider(
-                                  color: AppColors.greyScaleColor.withValues(
-                                    alpha: 0.2,
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
+                                ],
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },

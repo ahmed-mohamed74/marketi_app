@@ -17,6 +17,7 @@ import 'package:marketi_app/features/home_feature/presentation/widgets/category_
 import 'package:marketi_app/features/home_feature/presentation/widgets/popular_product_section_widget.dart';
 import 'package:marketi_app/features/home_feature/presentation/widgets/search_section_widget.dart';
 import 'package:marketi_app/features/home_feature/presentation/widgets/section_header_widget.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,6 +27,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  List<dynamic> _getMockItems(String sectionType) {
+    if (sectionType == 'Categories' || sectionType == 'Brands') {
+      return List.generate(6, (index) => null); // Adjust based on your model
+    }
+    return List.generate(4, (index) => null);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -46,24 +54,29 @@ class _HomeScreenState extends State<HomeScreen> {
     required VoidCallback onSeeAll,
     required Widget Function(List<T> items) builder,
   }) {
-    if (status == RequestStatus.loading) {
-      return const SizedBox(
-        height: 60,
-        child: Center(child: CircularProgressIndicator()),
-      );
-    } else if (status == RequestStatus.error) {
+    if (status == RequestStatus.error) {
       return SizedBox(
         height: 60,
         child: Center(child: Text(error ?? 'Something went wrong')),
       );
-    } else if (items.isEmpty) {
+    }
+    final isRefreshing = status == RequestStatus.loading;
+    final displayItems = (isRefreshing && items.isEmpty)
+        ? _getMockItems(title) as List<T>
+        : items;
+
+    if (displayItems.isEmpty && !isRefreshing) {
       return const SizedBox(
         height: 60,
         child: Center(child: Text('No items found')),
       );
-    } else {
-      return builder(items);
     }
+
+    return Skeletonizer(
+      enabled: isRefreshing,
+      ignoreContainers: true, // Keep this true if you want faster performance
+      child: builder(displayItems),
+    );
   }
 
   @override
@@ -87,195 +100,206 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         title: Text('Hi $userName !', style: AppTextStyles.appBarTitle1),
       ),
-      body: BlocBuilder<HomeCubit, HomeState>(
-        builder: (context, state) {
-          return Padding(
-            padding: const EdgeInsets.all(14),
-            child: SingleChildScrollView(
-              child: MultiBlocListener(
-                listeners: [
-                  BlocListener<AddProductCubit, AddProductState>(
-                    listener: (context, state) {
-                      if (state is AddCartProductSuccess) {
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(SnackBar(content: Text(state.message)));
-                      }
-                    },
-                  ),
-                  BlocListener<AddFavouriteCubit, AddFavouriteState>(
-                    listener: (context, state) {
-                      if (state is AddFavouriteProductSuccess) {
-                        context
-                            .read<GetFavouriteCubit>()
-                            .getFavouriteProducts();
-                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(state.message),
-                            duration: const Duration(
-                              milliseconds: 700,
-                            ), // Shorter duration for better feel
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                ],
-                child: Column(
-                  children: [
-                    SearchSectionWidget(products: state.bestProducts),
-                    const SizedBox(height: 14),
-                    const CarouselSliderWidget(),
-                    const SizedBox(height: 20),
-
-                    // Popular Products
-                    Column(
-                      children: [
-                        SectionHeaderWidget(
-                          title: 'Popular Product',
-                          onPressed: () {
-                            context.push(
-                              AppRoutes.allProductsPage,
-                              extra: 'Popular Product',
-                            );
-                          },
-                        ),
-                        _buildSection(
-                          title: 'Popular Product',
-                          items: state.popularProducts,
-                          status: state.popularStatus,
-                          error: state.popularError,
-                          onSeeAll: () {},
-                          builder: (items) =>
-                              ProductsSectionWidget(popularProducts: items),
-                        ),
-                      ],
+      body: SkeletonizerConfig(
+        data: SkeletonizerConfigData(
+          ignoreContainers: true,
+          effect: ShimmerEffect(
+            baseColor: AppColors.lightBlueColor.withValues(alpha: 0.5),
+            highlightColor: Colors.white,
+            begin: AlignmentGeometry.topLeft,
+            end: AlignmentGeometry.bottomRight,
+          ),
+        ),
+        child: BlocBuilder<HomeCubit, HomeState>(
+          builder: (context, state) {
+            return Padding(
+              padding: const EdgeInsets.all(14),
+              child: SingleChildScrollView(
+                child: MultiBlocListener(
+                  listeners: [
+                    BlocListener<AddProductCubit, AddProductState>(
+                      listener: (context, state) {
+                        if (state is AddCartProductSuccess) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(state.message)),
+                          );
+                        }
+                      },
                     ),
-                    const SizedBox(height: 20),
-
-                    // Categories
-                    Column(
-                      children: [
-                        SectionHeaderWidget(
-                          title: 'Category',
-                          onPressed: () {
-                            context.push(
-                              AppRoutes.allCategoryBrandsPage,
-                              extra: {
-                                'title': 'Category',
-                                'categoryItems': state.categories,
-                                'brandItems': state.brands,
-                              },
-                            );
-                          },
-                        ),
-                        _buildSection(
-                          title: 'Categories',
-                          items: state.categories,
-                          status: state.categoriesStatus,
-                          error: state.categoriesError,
-                          onSeeAll: () {},
-                          builder: (items) => CategoryBrandSectionWidget(
-                            isBrand: false,
-                            categoryItems: state.categories,
-                            brandItems: state.brands,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Best Products
-                    Column(
-                      children: [
-                        SectionHeaderWidget(
-                          title: 'Best for You',
-                          onPressed: () {
-                            context.push(
-                              AppRoutes.allProductsPage,
-                              extra: 'Best for You',
-                            );
-                          },
-                        ),
-                        _buildSection(
-                          title: 'Best Products',
-                          items: state.bestProducts,
-                          status: state.bestStatus,
-                          error: state.bestError,
-                          onSeeAll: () {},
-                          builder: (items) => ProductsSectionWidget(
-                            popularProducts: items,
-                            withAddButton: true,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Brands
-                    Column(
-                      children: [
-                        SectionHeaderWidget(
-                          title: 'Brands',
-                          onPressed: () {
-                            context.push(
-                              AppRoutes.allCategoryBrandsPage,
-                              extra: {
-                                'title': 'Brands',
-                                'categoryItems': state.categories,
-                                'brandItems': state.brands,
-                              },
-                            );
-                          },
-                        ),
-                        _buildSection(
-                          title: 'Brands',
-                          items: state.brands,
-                          status: state.brandsStatus,
-                          error: state.brandsError,
-                          onSeeAll: () {},
-                          builder: (items) => CategoryBrandSectionWidget(
-                            isBrand: true,
-                            categoryItems: state.categories,
-                            brandItems: state.brands,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Buy Again
-                    Column(
-                      children: [
-                        SectionHeaderWidget(
-                          title: 'Buy Again',
-                          onPressed: () {
-                            context.push(
-                              AppRoutes.allProductsPage,
-                              extra: 'Buy Again',
-                            );
-                          },
-                        ),
-                        _buildSection(
-                          title: 'Buy Again',
-                          items: state.buyAgainProducts,
-                          status: state.buyAgainStatus,
-                          error: state.buyAgainError,
-                          onSeeAll: () {},
-                          builder: (items) => ProductsSectionWidget(
-                            popularProducts: items,
-                            withAddButton: true,
-                          ),
-                        ),
-                      ],
+                    BlocListener<AddFavouriteCubit, AddFavouriteState>(
+                      listener: (context, state) {
+                        if (state is AddFavouriteProductSuccess) {
+                          context
+                              .read<GetFavouriteCubit>()
+                              .getFavouriteProducts();
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(state.message),
+                              duration: const Duration(
+                                milliseconds: 700,
+                              ), // Shorter duration for better feel
+                            ),
+                          );
+                        }
+                      },
                     ),
                   ],
+                  child: Column(
+                    children: [
+                      SearchSectionWidget(products: state.bestProducts),
+                      const SizedBox(height: 14),
+                      const CarouselSliderWidget(),
+                      const SizedBox(height: 20),
+
+                      // Popular Products
+                      Column(
+                        children: [
+                          SectionHeaderWidget(
+                            title: 'Popular Product',
+                            onPressed: () {
+                              context.push(
+                                AppRoutes.allProductsPage,
+                                extra: 'Popular Product',
+                              );
+                            },
+                          ),
+                          _buildSection(
+                            title: 'Popular Product',
+                            items: state.popularProducts,
+                            status: state.popularStatus,
+                            error: state.popularError,
+                            onSeeAll: () {},
+                            builder: (items) =>
+                                ProductsSectionWidget(popularProducts: items),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Categories
+                      Column(
+                        children: [
+                          SectionHeaderWidget(
+                            title: 'Category',
+                            onPressed: () {
+                              context.push(
+                                AppRoutes.allCategoryBrandsPage,
+                                extra: {
+                                  'title': 'Category',
+                                  'categoryItems': state.categories,
+                                  'brandItems': state.brands,
+                                },
+                              );
+                            },
+                          ),
+                          _buildSection(
+                            title: 'Categories',
+                            items: state.categories,
+                            status: state.categoriesStatus,
+                            error: state.categoriesError,
+                            onSeeAll: () {},
+                            builder: (items) => CategoryBrandSectionWidget(
+                              isBrand: false,
+                              categoryItems: state.categories,
+                              brandItems: state.brands,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Best Products
+                      Column(
+                        children: [
+                          SectionHeaderWidget(
+                            title: 'Best for You',
+                            onPressed: () {
+                              context.push(
+                                AppRoutes.allProductsPage,
+                                extra: 'Best for You',
+                              );
+                            },
+                          ),
+                          _buildSection(
+                            title: 'Best Products',
+                            items: state.bestProducts,
+                            status: state.bestStatus,
+                            error: state.bestError,
+                            onSeeAll: () {},
+                            builder: (items) => ProductsSectionWidget(
+                              popularProducts: items,
+                              withAddButton: true,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Brands
+                      Column(
+                        children: [
+                          SectionHeaderWidget(
+                            title: 'Brands',
+                            onPressed: () {
+                              context.push(
+                                AppRoutes.allCategoryBrandsPage,
+                                extra: {
+                                  'title': 'Brands',
+                                  'categoryItems': state.categories,
+                                  'brandItems': state.brands,
+                                },
+                              );
+                            },
+                          ),
+                          _buildSection(
+                            title: 'Brands',
+                            items: state.brands,
+                            status: state.brandsStatus,
+                            error: state.brandsError,
+                            onSeeAll: () {},
+                            builder: (items) => CategoryBrandSectionWidget(
+                              isBrand: true,
+                              categoryItems: state.categories,
+                              brandItems: state.brands,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Buy Again
+                      Column(
+                        children: [
+                          SectionHeaderWidget(
+                            title: 'Buy Again',
+                            onPressed: () {
+                              context.push(
+                                AppRoutes.allProductsPage,
+                                extra: 'Buy Again',
+                              );
+                            },
+                          ),
+                          _buildSection(
+                            title: 'Buy Again',
+                            items: state.buyAgainProducts,
+                            status: state.buyAgainStatus,
+                            error: state.buyAgainError,
+                            onSeeAll: () {},
+                            builder: (items) => ProductsSectionWidget(
+                              popularProducts: items,
+                              withAddButton: true,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
