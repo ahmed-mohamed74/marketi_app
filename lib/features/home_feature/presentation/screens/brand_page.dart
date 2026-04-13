@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skeletonizer/skeletonizer.dart'; // Add this
 import 'package:marketi_app/core/common/widgets/back_button_widget.dart';
 import 'package:marketi_app/core/routing/app_routes.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
+import 'package:marketi_app/features/home_feature/data/models/product_model.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/add_product_cubit/add_product_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/add_favourite_cubit/add_favourite_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/delete_favourite_cubit/delete_favourite_cubit.dart';
@@ -71,36 +73,48 @@ class _BrandPageState extends State<BrandPage> {
             listener: (context, state) {
               if (state is DeleteFavouriteProductSuccess) {
                 context.read<GetFavouriteCubit>().getFavouriteProducts();
-
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Removed from favorites")),
+                  const SnackBar(content: Text("Removed from favorites")),
                 );
-              } else if (state is DeleteFavouriteProductFailure) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text("Failed to remove")));
               }
             },
           ),
         ],
         child: BlocBuilder<HomeCubit, HomeState>(
           builder: (context, homeState) {
-            if (homeState.productsByBrandStatus == RequestStatus.loading) {
-              return const SizedBox(
-                height: 60,
-                child: Center(child: CircularProgressIndicator()),
-              );
-            } else if (homeState.productsByBrandStatus == RequestStatus.error) {
-              return SizedBox(
-                height: 60,
-                child: Center(
-                  child: Text(
-                    homeState.productsByBrandError ?? 'Something went wrong',
-                  ),
+            final bool isLoading =
+                homeState.productsByBrandStatus == RequestStatus.loading;
+
+            // Handle Error State
+            if (homeState.productsByBrandStatus == RequestStatus.error &&
+                homeState.productsByBrand.isEmpty) {
+              return Center(
+                child: Text(
+                  homeState.productsByBrandError ?? 'Something went wrong',
                 ),
               );
-            } else if (homeState.productsByBrand.isNotEmpty) {
-              return BlocBuilder<GetFavouriteCubit, GetFavouriteState>(
+            }
+
+            // Create Dummy Data for the Skeleton
+            final List<ProductModel> products = isLoading
+                ? List.generate(
+                    5,
+                    (index) => ProductModel(
+                      id: index,
+                      title: 'Loading Brand Product',
+                      price: 0.0,
+                      rating: 0.0,
+                      images: [''],
+                    ),
+                  )
+                : homeState.productsByBrand;
+
+            // Handle Empty State
+            if (!isLoading && products.isEmpty) {
+              return const Center(child: Text('No items found'));
+            }
+
+            return BlocBuilder<GetFavouriteCubit, GetFavouriteState>(
               builder: (context, favState) {
                 List<int> favIds = [];
                 if (favState is GetFavouritesProductsSuccess) {
@@ -108,37 +122,50 @@ class _BrandPageState extends State<BrandPage> {
                       .map((p) => p.id!)
                       .toList();
                 }
-                  return Padding(
+
+                return Skeletonizer(
+                  enabled: isLoading,
+                  ignoreContainers: true,
+                  child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                        SearchSectionWidget(products: homeState.productsByBrand),
-                        SizedBox(height: 10),
+                        SearchSectionWidget(products: products),
+                        const SizedBox(height: 10),
                         Expanded(
                           child: ListView.builder(
-                            itemCount: homeState.productsByBrand.length,
+                            itemCount: products.length,
                             itemBuilder: (context, index) {
-                              final product = homeState.productsByBrand[index];
+                              final product = products[index];
                               final bool isProductInFav = favIds.contains(
-                              product.id,
-                            );
+                                product.id,
+                              );
+
                               return Column(
                                 children: [
                                   GestureDetector(
-                                  onTap: () => context.push(
-                                    AppRoutes.productPage,
-                                    extra: product,
+                                    onTap: isLoading
+                                        ? null
+                                        : () => context.push(
+                                            AppRoutes.productPage,
+                                            extra: product,
+                                          ),
+                                    child: ProductCardWithDetails(
+                                      id: product.id.toString(),
+                                      name: product.title ?? '',
+                                      image:
+                                          (product.images?.isNotEmpty ?? false)
+                                          ? product.images!.first
+                                          : '',
+                                      price: product.price?.toString() ?? '0.0',
+                                      rate: product.rating?.toString() ?? '0.0',
+                                      isFavourite: isProductInFav,
+                                      quantity: 1,
+                                      onIncrement: () {},
+                                      onDecrement: () {},
+                                      onDelete: () {},
+                                    ),
                                   ),
-                                  child: ProductCardWithDetails(
-                                    id: product.id.toString(),
-                                    name: product.title,
-                                    image: product.images?.first ?? '',
-                                    price: product.price?.toString() ?? '',
-                                    rate: product.rating?.toString() ?? '',
-                                    isFavourite:
-                                        isProductInFav, quantity: 1, onIncrement: () {  }, onDecrement: () {  }, onDelete: () {  },
-                                  ),
-                                ),
                                   Divider(
                                     color: AppColors.greyScaleColor.withValues(
                                       alpha: 0.2,
@@ -151,13 +178,9 @@ class _BrandPageState extends State<BrandPage> {
                         ),
                       ],
                     ),
-                  );
-                },
-              );
-            }
-            return const SizedBox(
-              height: 60,
-              child: Center(child: Text('No items found')),
+                  ),
+                );
+              },
             );
           },
         ),

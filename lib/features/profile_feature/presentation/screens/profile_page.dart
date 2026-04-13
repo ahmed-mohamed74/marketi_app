@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skeletonizer/skeletonizer.dart'; // Add this
 
 import 'package:marketi_app/core/common/widgets/back_button_widget.dart';
-import 'package:marketi_app/core/common/widgets/loader.dart';
 import 'package:marketi_app/core/constants/asset_images.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
@@ -30,21 +30,34 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: BackButtonWidget(onPressed: () => context.pop()),
-        leadingWidth: 64,
         title: Text('My Profile', style: AppTextStyles.appBarTitle1),
         centerTitle: true,
         actions: [
           IconButton(
             onPressed: () {},
-            icon: Icon(Icons.shopping_cart_outlined),
+            icon: const Icon(Icons.shopping_cart_outlined),
           ),
         ],
       ),
       body: BlocBuilder<ProfileCubit, ProfileState>(
         builder: (context, state) {
-          if (state is ProfileSuccess) {
-            return Column(
+          final bool isLoading = state is ProfileLoading;
+
+          // 1. Extract data or provide MOCK data for the Skeletonizer bones
+          final user = (state is ProfileSuccess) ? state.user : null;
+
+          final userName = isLoading
+              ? 'Loading Full Name'
+              : (user?.name ?? 'Guest User');
+          final userHandle = isLoading
+              ? '@loading_handle'
+              : '@${user?.name ?? 'guest'}';
+          final userImage = isLoading ? '' : (user?.image ?? '');
+
+          return Skeletonizer(
+            enabled: isLoading,
+            ignoreContainers: true, // Keeps your custom shapes clean
+            child: Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.all(30),
@@ -65,45 +78,22 @@ class _ProfilePageState extends State<ProfilePage> {
                                   radius: 50,
                                   backgroundColor: AppColors.lightBlueColor,
                                   child: ClipOval(
-                                    child:
-                                        state.user.image != null &&
-                                            state.user.image!.isNotEmpty
+                                    child: userImage.isNotEmpty
                                         ? Image.network(
-                                            state.user.image!,
+                                            userImage,
                                             width: 100,
                                             height: 100,
                                             fit: BoxFit.cover,
-                                            errorBuilder: (_, _, _) => Icon(
-                                              Icons.person_outline,
-                                              size: 60,
-                                              color: AppColors.navyColor,
-                                            ),
-                                            loadingBuilder:
-                                                (context, child, progress) {
-                                                  if (progress == null) {
-                                                    return child;
-                                                  }
-                                                  return Icon(
-                                                    Icons.person_outline,
-                                                    size: 60,
-                                                    color: AppColors.navyColor,
-                                                  );
-                                                },
+                                            errorBuilder: (_, __, ___) =>
+                                                _buildPlaceholder(),
                                           )
-                                        : Icon(
-                                            Icons.person_outline,
-                                            size: 60,
-                                            color: AppColors.navyColor,
-                                          ),
+                                        : _buildPlaceholder(),
                                   ),
                                 ),
-                                SizedBox(height: 8),
+                                const SizedBox(height: 8),
+                                Text(userName, style: AppTextStyles.heading1),
                                 Text(
-                                  state.user.name ?? 'Your Name',
-                                  style: AppTextStyles.heading1,
-                                ),
-                                Text(
-                                  '@${state.user.name ?? '@user_name'}',
+                                  userHandle,
                                   style: AppTextStyles.heading3.copyWith(
                                     color: AppColors.greyScaleColor,
                                   ),
@@ -117,77 +107,55 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: 1,
-                    itemBuilder: (context, index) {
-                      return Column(
-                        children: [
-                          ListTileWidget(
-                            leadingIcon: Icons.person_2_outlined,
-                            title: 'Account Preferences',
-                            trailingWidget: IconButton(
-                              onPressed: () {},
-                              icon: Icon(Icons.keyboard_arrow_right),
-                            ),
-                          ),
-                          ListTileWidget(
-                            leadingIcon: Icons.payment,
-                            title: 'Subscription & Payment',
-                            trailingWidget: IconButton(
-                              onPressed: () {},
-                              icon: Icon(Icons.keyboard_arrow_right),
-                            ),
-                          ),
-                          ListTileWidget(
-                            leadingIcon: Icons.notifications_active_outlined,
-                            title: 'App Notifications',
-                            trailingWidget: Switch(
-                              value: true,
-                              onChanged: (value) {},
-                            ),
-                          ),
-                          ListTileWidget(
-                            leadingIcon: Icons.mode_night_outlined,
-                            title: 'Dark Mode',
-                            trailingWidget: Switch(
-                              value: false,
-                              onChanged: (value) {},
-                            ),
-                          ),
-                          ListTileWidget(
-                            leadingIcon: Icons.star_border_outlined,
-                            title: 'Rate Us',
-                            trailingWidget: IconButton(
-                              onPressed: () {},
-                              icon: Icon(Icons.keyboard_arrow_right),
-                            ),
-                          ),
-                          ListTileWidget(
-                            leadingIcon: Icons.feedback_outlined,
-                            title: 'Provide Feedback',
-                            trailingWidget: IconButton(
-                              onPressed: () {},
-                              icon: Icon(Icons.keyboard_arrow_right),
-                            ),
-                          ),
-                          ListTileWidget(
-                            leadingIcon: Icons.logout_outlined,
-                            title: 'Log Out',
-                            trailingWidget: IconButton(
-                              onPressed: () {},
-                              icon: Icon(Icons.keyboard_arrow_right),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
+                  child: ListView(
+                    physics: isLoading
+                        ? const NeverScrollableScrollPhysics()
+                        : const BouncingScrollPhysics(),
+                    children: [
+                      _buildItem(
+                        Icons.person_2_outlined,
+                        'Account Preferences',
+                      ),
+                      _buildItem(Icons.payment, 'Subscription & Payment'),
+                      ListTileWidget(
+                        leadingIcon: Icons.notifications_active_outlined,
+                        title: 'App Notifications',
+                        trailingWidget: Switch(value: true, onChanged: (v) {}),
+                      ),
+                      ListTileWidget(
+                        leadingIcon: Icons.mode_night_outlined,
+                        title: 'Dark Mode',
+                        trailingWidget: Switch(value: false, onChanged: (v) {}),
+                      ),
+                      _buildItem(Icons.star_border_outlined, 'Rate Us'),
+                      _buildItem(Icons.feedback_outlined, 'Provide Feedback'),
+                      _buildItem(Icons.logout_outlined, 'Log Out'),
+                    ],
                   ),
                 ),
               ],
-            );
-          }
-          return Loader();
+            ),
+          );
         },
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return const Icon(
+      Icons.person_outline,
+      size: 60,
+      color: AppColors.navyColor,
+    );
+  }
+
+  Widget _buildItem(IconData icon, String title) {
+    return ListTileWidget(
+      leadingIcon: icon,
+      title: title,
+      trailingWidget: IconButton(
+        onPressed: () {},
+        icon: const Icon(Icons.keyboard_arrow_right),
       ),
     );
   }

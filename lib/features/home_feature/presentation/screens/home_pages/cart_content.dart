@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:marketi_app/features/home_feature/data/models/product_model.dart';
+import 'package:skeletonizer/skeletonizer.dart'; // Added Import
 import 'package:marketi_app/core/common/widgets/primary_button_widget.dart';
 import 'package:marketi_app/core/constants/app_sizes.dart';
 import 'package:marketi_app/core/routing/app_routes.dart';
@@ -31,10 +33,9 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = AppSizes(context: context).screenHeight;
+
     return Scaffold(
       appBar: AppBar(
-        // leading: BackButtonWidget(onPressed: () => context.pop()),
-        // leadingWidth: 64,
         title: Text('Cart', style: AppTextStyles.appBarTitle1),
         actions: const [
           Padding(
@@ -78,47 +79,40 @@ class _CartScreenState extends State<CartScreen> {
             listener: (context, state) {
               if (state is DeleteFavouriteProductSuccess) {
                 context.read<GetFavouriteCubit>().getFavouriteProducts();
-
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Removed from favorites")),
+                  const SnackBar(content: Text("Removed from favorites")),
                 );
-              } else if (state is DeleteFavouriteProductFailure) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text("Failed to remove")));
               }
             },
           ),
         ],
         child: BlocBuilder<GetProductsCubit, GetProductsState>(
           builder: (context, state) {
-            print("Cart UI Rebuilt with state: $state");
-            if (state is GetCartProductsLoading) {
-              return const SizedBox(
-                height: 60,
-                child: Center(child: CircularProgressIndicator()),
-              );
-            } else if (state is GetCartProductsSuccess) {
-              if (state.cartProducts.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.shopping_cart_outlined,
-                        size: 100,
-                        color: AppColors.greyScaleColor,
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'Your cart is empty!',
-                        style: AppTextStyles.heading2,
-                      ),
-                    ],
-                  ),
-                );
-              }
-              return BlocBuilder<GetFavouriteCubit, GetFavouriteState>(
+            // 1. Logic to handle Loading vs Success
+            final bool isLoading = state is GetCartProductsLoading;
+
+            if (!isLoading &&
+                state is GetCartProductsSuccess &&
+                state.cartProducts.isEmpty) {
+              return _buildEmptyState();
+            }
+
+            // 2. Prepare data for Skeletonizer (Real products or Dummy placeholders)
+            final cartProducts = isLoading
+                ? List.generate(
+                    5,
+                    (index) =>
+                        dynamic, // We just need a count; details are hardcoded below
+                  )
+                : (state as GetCartProductsSuccess).cartProducts;
+
+            final totalAmount = state is GetCartProductsSuccess
+                ? state.totalAmount
+                : 0.0;
+
+            return Skeletonizer(
+              enabled: isLoading,
+              child: BlocBuilder<GetFavouriteCubit, GetFavouriteState>(
                 builder: (context, favState) {
                   List<int> favIds = [];
                   if (favState is GetFavouritesProductsSuccess) {
@@ -126,131 +120,147 @@ class _CartScreenState extends State<CartScreen> {
                         .map((p) => p.id!)
                         .toList();
                   }
-                  return SingleChildScrollView(
-                    physics: NeverScrollableScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 14),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Text(
-                            'Products on Cart',
-                            style: AppTextStyles.heading1,
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 14),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(
+                          'Products on Cart',
+                          style: AppTextStyles.heading1,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: ListView.builder(
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: cartProducts.length,
+                            itemBuilder: (context, index) {
+                              // If loading, we pass fake strings to the widget
+                              dynamic product = isLoading
+                                  ? null
+                                  : cartProducts[index];
+                              final bool isProductInFav = isLoading
+                                  ? false
+                                  : favIds.contains(product?.id);
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 14),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    border: Border.all(
+                                      color: AppColors.lightBlueColor
+                                          .withValues(alpha: 0.3),
+                                    ),
+                                  ),
+                                  child: ProductCardWithDetails(
+                                    image: product?.images?.first,
+                                    price:
+                                        product?.price.toString() ?? "000.00",
+                                    rate: product?.rating.toString() ?? "0.0",
+                                    name:
+                                        product?.title ??
+                                        "Product Name Placeholder",
+                                    inCart: true,
+                                    id:
+                                        product?.id.toString() ??
+                                        index.toString(),
+                                    isFavourite: isProductInFav,
+                                    onIncrement: () => !isLoading
+                                        ? context
+                                              .read<GetProductsCubit>()
+                                              .updateQuantity(index, true)
+                                        : null,
+                                    onDecrement: () => !isLoading
+                                        ? context
+                                              .read<GetProductsCubit>()
+                                              .updateQuantity(index, false)
+                                        : null,
+                                    onDelete: () => !isLoading
+                                        ? context
+                                              .read<DeleteProductCubit>()
+                                              .deleteCartProduct(
+                                                id: product!.id.toString(),
+                                              )
+                                        : null,
+                                    quantity: product?.quantity ?? 1,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ),
-                        SizedBox(height: 10),
-                        Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
-                              child: SizedBox(
-                                height: screenHeight * 0.617,
-                                child: ListView.builder(
-                                  itemCount: state.cartProducts.length,
-                                  itemBuilder: (context, index) {
-                                    final product = state.cartProducts[index];
-                                    final bool isProductInFav = favIds.contains(
-                                      product.id,
-                                    );
-                                    return Column(
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              15,
-                                            ),
-                                            border: Border.all(
-                                              color: AppColors.lightBlueColor
-                                                  .withValues(alpha: 0.3),
-                                            ),
-                                          ),
-                                          child: ProductCardWithDetails(
-                                            image: product.images?.first,
-                                            price: product.price.toString(),
-                                            rate: product.rating.toString(),
-                                            name: product.title,
-                                            inCart: true,
-                                            id: product.id.toString(),
-                                            isFavourite: isProductInFav,
-                                            onIncrement: () => context
-                                                .read<GetProductsCubit>()
-                                                .updateQuantity(index, true),
-                                            onDecrement: () => context
-                                                .read<GetProductsCubit>()
-                                                .updateQuantity(index, false),
-                                            onDelete: () => context
-                                                .read<DeleteProductCubit>()
-                                                .deleteCartProduct(
-                                                  id: product.id.toString(),
-                                                ),
-                                            quantity: product.quantity,
-                                          ),
-                                        ),
-                                        SizedBox(height: 14),
-                                      ],
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                            Card(
-                              elevation: 1,
-                              shape: ContinuousRectangleBorder(
-                                borderRadius: BorderRadiusGeometry.circular(10),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'Suptotal (${state.cartProducts.length} items)',
-                                          style: AppTextStyles.heading3,
-                                        ),
-                                        Text(
-                                          'EGP ${state.totalAmount.toStringAsFixed(2)}',
-                                          style: AppTextStyles.heading3,
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 10),
-                                    PrimaryButtonWidget(
-                                      text: 'Checkout',
-                                      onPressed: () {
-                                        context.push(
-                                          AppRoutes.checkoutPage,
-                                          extra: {
-                                            'amount': state.totalAmount,
-                                            'suptotalItems':
-                                                state.cartProducts.length,
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                      ),
+                      _buildCheckoutSection(
+                        totalAmount,
+                        cartProducts.length,
+                        isLoading,
+                      ),
+                    ],
                   );
                 },
-              );
-            } else {
-              return SizedBox(
-                height: 60,
-                child: Center(child: Text('Cart has no product !!')),
-              );
-            }
+              ),
+            );
           },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.shopping_cart_outlined,
+            size: 100,
+            color: AppColors.greyScaleColor,
+          ),
+          const SizedBox(height: 20),
+          Text('Your cart is empty!', style: AppTextStyles.heading2),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCheckoutSection(double total, int itemCount, bool isLoading) {
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Subtotal ($itemCount items)',
+                  style: AppTextStyles.heading3,
+                ),
+                Text(
+                  'EGP ${total.toStringAsFixed(2)}',
+                  style: AppTextStyles.heading3,
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            PrimaryButtonWidget(
+              text: 'Checkout',
+              onPressed: isLoading
+                  ? () {}
+                  : () {
+                      context.push(
+                        AppRoutes.checkoutPage,
+                        extra: {'amount': total, 'suptotalItems': itemCount},
+                      );
+                    },
+            ),
+          ],
         ),
       ),
     );

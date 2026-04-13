@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:marketi_app/core/routing/app_routes.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
@@ -9,6 +10,7 @@ import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_c
 import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/get_favourites_cubit/get_favourites_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/widgets/product_card_widget.dart';
 import 'package:marketi_app/features/home_feature/presentation/widgets/search_section_widget.dart';
+import 'package:marketi_app/features/home_feature/data/models/product_model.dart';
 
 class FavouriteScreen extends StatefulWidget {
   const FavouriteScreen({super.key});
@@ -55,52 +57,49 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
             listener: (context, state) {
               if (state is DeleteFavouriteProductSuccess) {
                 context.read<GetFavouriteCubit>().getFavouriteProducts();
-
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Removed from favorites")),
+                  const SnackBar(content: Text("Removed from favorites")),
                 );
-              } else if (state is DeleteFavouriteProductFailure) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text("Failed to remove")));
               }
             },
           ),
         ],
         child: BlocBuilder<GetFavouriteCubit, GetFavouriteState>(
           builder: (context, state) {
-            if (state is GetFavouritesProductsLoading) {
-              return const SizedBox(
-                height: 60,
-                child: Center(child: CircularProgressIndicator()),
-              );
-            } else if (state is GetFavouritesProductsSuccess) {
-              if (state.favouriteProducts.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.shopping_cart_outlined,
-                        size: 100,
-                        color: AppColors.greyScaleColor,
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'Your favorite screen is empty!',
-                        style: AppTextStyles.heading2,
-                      ),
-                    ],
-                  ),
-                );
-              }
-              return Column(
+            final bool isLoading = state is GetFavouritesProductsLoading;
+
+            if (!isLoading &&
+                state is GetFavouritesProductsSuccess &&
+                state.favouriteProducts.isEmpty) {
+              return _buildEmptyState();
+            }
+
+            // 1. Prepare Dummy Data with a valid placeholder URL to avoid the "Wrong Sign"
+            final List<ProductModel> displayedProducts = isLoading
+                ? List.generate(
+                    6,
+                    (index) => ProductModel(
+                      id: index,
+                      title: "Loading Product Title",
+                      price: 100.0,
+                      rating: 4.5,
+                      // Using a transparent/placeholder image prevents the error icon
+                      images: ["https://via.placeholder.com/150"],
+                    ),
+                  )
+                : (state is GetFavouritesProductsSuccess
+                      ? state.favouriteProducts
+                      : []);
+
+            return Skeletonizer(
+              enabled: isLoading,
+              containersColor: AppColors.lightBlueColor.withValues(alpha: 0.6),
+              ignoreContainers: true,
+              child: Column(
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: SearchSectionWidget(
-                      products: state.favouriteProducts,
-                    ),
+                    child: SearchSectionWidget(products: displayedProducts),
                   ),
                   const SizedBox(height: 8),
                   Expanded(
@@ -110,17 +109,19 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                           const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
                             childAspectRatio: 0.86,
-                            mainAxisSpacing: 8,
-                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 10,
+                            crossAxisSpacing: 10,
                           ),
-                      itemCount: state.favouriteProducts.length,
+                      itemCount: displayedProducts.length,
                       itemBuilder: (context, index) {
-                        final product = state.favouriteProducts[index];
+                        final product = displayedProducts[index];
                         return GestureDetector(
-                          onTap: () => context.push(
-                            AppRoutes.productPage,
-                            extra: product,
-                          ),
+                          onTap: isLoading
+                              ? null
+                              : () => context.push(
+                                  AppRoutes.productPage,
+                                  extra: product,
+                                ),
                           child: ProductCardWidget(
                             product: product,
                             isFavourite: true,
@@ -130,15 +131,27 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                     ),
                   ),
                 ],
-              );
-            } else {
-              return SizedBox(
-                height: 60,
-                child: Center(child: Text(' You has no favorite products !!')),
-              );
-            }
+              ),
+            );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.favorite_border,
+            size: 100,
+            color: AppColors.greyScaleColor,
+          ),
+          const SizedBox(height: 20),
+          Text('Your favorite screen is empty!', style: AppTextStyles.heading2),
+        ],
       ),
     );
   }

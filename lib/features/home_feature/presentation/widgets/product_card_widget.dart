@@ -39,7 +39,22 @@ class ProductCardWidget extends StatelessWidget {
                     child: product.images?.isNotEmpty == true
                         ? Image.network(
                             product.images!.first,
-                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: Colors.grey[200],
+                                child: const Icon(
+                                  Icons.image_outlined,
+                                  color: Colors.grey,
+                                ),
+                              );
+                            },
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(color: Colors.grey[100]);
+                            },
                           )
                         : Image.asset(
                             'assets/images/product2_image.png',
