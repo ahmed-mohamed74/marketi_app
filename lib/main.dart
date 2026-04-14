@@ -9,7 +9,7 @@ import 'core/routing/app_state_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Stripe.publishableKey=StripeKeys.publishableKey;
+  Stripe.publishableKey = StripeKeys.publishableKey;
   await serviceLocatorInit();
   CacheHelper().init();
   final appStateService = serviceLocator<AppStateService>();

@@ -8,6 +8,9 @@ import 'package:marketi_app/core/routing/app_routes.dart';
 import 'package:marketi_app/core/services/cache/cache_helper.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/core/themes/styles.dart';
+import 'package:marketi_app/features/home_feature/data/models/brand_model.dart';
+import 'package:marketi_app/features/home_feature/data/models/category_model.dart';
+import 'package:marketi_app/features/home_feature/data/models/product_model.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/add_product_cubit/add_product_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/add_favourite_cubit/add_favourite_cubit.dart';
 import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/get_favourites_cubit/get_favourites_cubit.dart';
@@ -27,11 +30,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<dynamic> _getMockItems(String sectionType) {
-    if (sectionType == 'Categories' || sectionType == 'Brands') {
-      return List.generate(6, (index) => null); // Adjust based on your model
+  List<T> _getMockItems<T>(String sectionType) {
+    if (sectionType == 'Categories') {
+      return List.generate(
+        6,
+        (index) => CategoryModel(image: '', name: '', slug: '', url: '') as T,
+      );
+    } else if (sectionType == 'Brands') {
+      return List.generate(6, (index) => BrandModel(emoji: '', name: '') as T);
     }
-    return List.generate(4, (index) => null);
+    return List.generate(4, (index) => ProductModel() as T);
   }
 
   @override
@@ -60,9 +68,11 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Center(child: Text(error ?? 'Something went wrong')),
       );
     }
+
     final isRefreshing = status == RequestStatus.loading;
+
     final displayItems = (isRefreshing && items.isEmpty)
-        ? _getMockItems(title) as List<T>
+        ? _getMockItems<T>(title)
         : items;
 
     if (displayItems.isEmpty && !isRefreshing) {
@@ -74,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Skeletonizer(
       enabled: isRefreshing,
-      ignoreContainers: true, // Keep this true if you want faster performance
+      ignoreContainers: true,
       child: builder(displayItems),
     );
   }

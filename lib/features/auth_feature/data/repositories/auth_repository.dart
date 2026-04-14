@@ -5,18 +5,23 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:marketi_app/core/api/api_consumer.dart';
 import 'package:marketi_app/core/api/end_points.dart';
 import 'package:marketi_app/core/api/errors/server_exceptions.dart';
+import 'package:marketi_app/core/network/connection_checker.dart';
 import 'package:marketi_app/core/services/cache/cache_helper.dart';
 import 'package:marketi_app/features/auth_feature/data/models/sign_in_model.dart';
 import 'package:marketi_app/features/auth_feature/data/models/user_model.dart';
 
 class AuthRepository {
+  final ConnectionChecker connectionChecker;
   final ApiConsumer api;
-  AuthRepository({required this.api});
+  AuthRepository(this.connectionChecker, this.api);
   Future<Either<String, UserModel>> signIn({
     required String email,
     required String password,
   }) async {
     try {
+      if (!await (connectionChecker.isConnected)) {
+        return Left('No internet connection!');
+      }
       final response = await api.post(
         EndPoints.signIn,
         data: {ApiKey.email: email, ApiKey.password: password},
@@ -58,6 +63,9 @@ class AuthRepository {
     required String confirmPassword,
   }) async {
     try {
+      if (!await (connectionChecker.isConnected)) {
+        return Left('No internet connection!');
+      }
       final response = await api.post(
         EndPoints.signUp,
         data: {
@@ -81,6 +89,9 @@ class AuthRepository {
     required String email,
   }) async {
     try {
+      if (!await (connectionChecker.isConnected)) {
+        return Left('No internet connection!');
+      }
       final response = await api.post(
         EndPoints.resetPassword,
         data: {ApiKey.email: email},
@@ -101,6 +112,9 @@ class AuthRepository {
     required String code,
   }) async {
     try {
+      if (!await (connectionChecker.isConnected)) {
+        return Left('No internet connection!');
+      }
       final response = await api.post(
         EndPoints.verificationResetPass,
         data: {ApiKey.email: email, ApiKey.code: code},
@@ -122,6 +136,9 @@ class AuthRepository {
     required String confirmPasssword,
   }) async {
     try {
+      if (!await (connectionChecker.isConnected)) {
+        return Left('No internet connection!');
+      }
       final response = await api.post(
         EndPoints.confirmResetPassword,
         data: {
