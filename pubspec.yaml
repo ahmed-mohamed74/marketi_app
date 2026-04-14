@@ -74,9 +74,9 @@ flutter_native_splash:
   ios: true
   web: false
   color: "#FFFFFF"
-  image: assets/images/marketi_logo.png
+  image: assets/images/marketi_logo_done.png
   android_gravity: center
-  fullscreen: false
+  fullscreen: true
 # The following section is specific to Flutter packages.
 flutter:
 
