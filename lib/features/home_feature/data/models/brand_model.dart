@@ -1,7 +1,14 @@
 import 'dart:convert';
 
+import 'package:hive/hive.dart';
+
+part 'brand_model.g.dart';
+@HiveType(typeId: 5)
+
 class BrandModel {
+  @HiveField(0)
   final String? emoji;
+  @HiveField(1)
   final String? name;
   BrandModel({
     required this.emoji,

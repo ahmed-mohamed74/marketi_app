@@ -1,9 +1,18 @@
 import 'dart:convert';
 
+import 'package:hive/hive.dart';
+
+part 'category_model.g.dart';
+
+@HiveType(typeId: 4)
 class CategoryModel {
+  @HiveField(0)
   final String image;
+  @HiveField(1)
   final String name;
+  @HiveField(2)
   final String slug;
+  @HiveField(3)
   final String url;
   CategoryModel({
     required this.image,

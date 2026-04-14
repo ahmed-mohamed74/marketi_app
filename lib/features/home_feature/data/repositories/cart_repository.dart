@@ -1,22 +1,38 @@
 import 'package:dartz/dartz.dart';
 import 'package:marketi_app/core/api/api_consumer.dart';
 import 'package:marketi_app/core/api/end_points.dart';
+import 'package:marketi_app/core/network/connection_checker.dart';
+import 'package:marketi_app/core/services/cache/product_local_data_source.dart';
 import 'package:marketi_app/features/home_feature/data/models/product_model.dart';
 
 class CartRepository {
   final ApiConsumer api;
+  final ConnectionChecker connectionChecker;
+  final ProductLocalDataSource productLocalDataSource;
 
-  CartRepository({required this.api});
+  CartRepository({
+    required this.api,
+    required this.connectionChecker,
+    required this.productLocalDataSource,
+  });
   Future<Either<String, List<ProductModel>>> getCartProducts() async {
-    try {
-      final response = await api.get(EndPoints.getCartProducts);
-      final products = (response['list'] as List)
-          .map((e) => ProductModel.fromJson(e))
-          .toList();
+    if (await connectionChecker.isConnected) {
+      try {
+        final response = await api.get(EndPoints.getCartProducts);
+        final products = (response['list'] as List)
+            .map((e) => ProductModel.fromJson(e))
+            .toList();
 
-      return Right(products);
-    } catch (e) {
-      return Left(e.toString());
+        await productLocalDataSource.cacheCartProducts(products: products);
+        return Right(products);
+      } catch (e) {
+        return Left(e.toString());
+      }
+    } else {
+      final local = productLocalDataSource.getCachedCartProducts();
+      return local.isNotEmpty
+          ? Right(local)
+          : const Left("No internet and no cached cart data.");
     }
   }
 
