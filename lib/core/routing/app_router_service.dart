@@ -3,34 +3,34 @@ import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/routing/app_routes.dart';
 import 'package:marketi_app/core/routing/app_state_service.dart';
 import 'package:marketi_app/core/services/service_locator.dart';
-import 'package:marketi_app/features/auth_feature/presentation/bloc/auth_bloc.dart';
-import 'package:marketi_app/features/auth_feature/presentation/screens/reset_password_pages/congratulation_page.dart';
-import 'package:marketi_app/features/auth_feature/presentation/screens/login_page.dart';
-import 'package:marketi_app/features/auth_feature/presentation/screens/reset_password_pages/new_password_page.dart';
-import 'package:marketi_app/features/auth_feature/presentation/screens/reset_password_pages/reset_password_page.dart';
-import 'package:marketi_app/features/auth_feature/presentation/screens/sign_up_screen.dart';
-import 'package:marketi_app/features/auth_feature/presentation/screens/reset_password_pages/verification_code_page.dart';
-import 'package:marketi_app/features/home_feature/data/models/brand_model.dart';
-import 'package:marketi_app/features/home_feature/data/models/category_model.dart';
-import 'package:marketi_app/features/home_feature/data/models/product_model.dart';
-import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/add_product_cubit/add_product_cubit.dart';
-import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/delete_product_cubit/delete_product_cubit.dart';
-import 'package:marketi_app/features/home_feature/presentation/cubit/cart_cubits/get_product_cubit/get_products_cubit.dart';
-import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/add_favourite_cubit/add_favourite_cubit.dart';
-import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/delete_favourite_cubit/delete_favourite_cubit.dart';
-import 'package:marketi_app/features/home_feature/presentation/cubit/favourite_cubits/get_favourites_cubit/get_favourites_cubit.dart';
-import 'package:marketi_app/features/home_feature/presentation/cubit/home_cubit/home_cubit.dart';
-import 'package:marketi_app/features/home_feature/presentation/cubit/payment_cubit/payment_cubit.dart';
-import 'package:marketi_app/features/home_feature/presentation/screens/brand_page.dart';
-import 'package:marketi_app/features/home_feature/presentation/screens/category_page.dart';
-import 'package:marketi_app/features/home_feature/presentation/screens/checkout_page.dart';
-import 'package:marketi_app/features/home_feature/presentation/screens/home_page.dart';
-import 'package:marketi_app/features/home_feature/presentation/screens/home_pages/all_category_brands_page.dart';
-import 'package:marketi_app/features/home_feature/presentation/screens/home_pages/all_products_page.dart';
-import 'package:marketi_app/features/home_feature/presentation/screens/product_page.dart';
-import 'package:marketi_app/features/onboarding_feature/presentation/screens/onbourding_screen.dart';
-import 'package:marketi_app/features/profile_feature/presentation/cubit/profile_cubit.dart';
-import 'package:marketi_app/features/profile_feature/presentation/screens/profile_page.dart';
+import 'package:marketi_app/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:marketi_app/features/auth/presentation/screens/reset_password_pages/congratulation_page.dart';
+import 'package:marketi_app/features/auth/presentation/screens/login_page.dart';
+import 'package:marketi_app/features/auth/presentation/screens/reset_password_pages/new_password_page.dart';
+import 'package:marketi_app/features/auth/presentation/screens/reset_password_pages/reset_password_page.dart';
+import 'package:marketi_app/features/auth/presentation/screens/sign_up_screen.dart';
+import 'package:marketi_app/features/auth/presentation/screens/reset_password_pages/verification_code_page.dart';
+import 'package:marketi_app/features/home/data/models/brand_model.dart';
+import 'package:marketi_app/features/home/data/models/category_model.dart';
+import 'package:marketi_app/features/home/data/models/product_model.dart';
+import 'package:marketi_app/features/cart/presentation/cart_cubits/add_product_cubit/add_product_cubit.dart';
+import 'package:marketi_app/features/cart/presentation/cart_cubits/delete_product_cubit/delete_product_cubit.dart';
+import 'package:marketi_app/features/cart/presentation/cart_cubits/get_product_cubit/get_products_cubit.dart';
+import 'package:marketi_app/features/favorite/presentation/favourite_cubits/add_favourite_cubit/add_favourite_cubit.dart';
+import 'package:marketi_app/features/favorite/presentation/favourite_cubits/delete_favourite_cubit/delete_favourite_cubit.dart';
+import 'package:marketi_app/features/favorite/presentation/favourite_cubits/get_favourites_cubit/get_favourites_cubit.dart';
+import 'package:marketi_app/features/home/presentation/home_cubit/home_cubit.dart';
+import 'package:marketi_app/features/checkout/presentation/payment_cubit/payment_cubit.dart';
+import 'package:marketi_app/features/home/presentation/screens/brand_page.dart';
+import 'package:marketi_app/features/home/presentation/screens/category_page.dart';
+import 'package:marketi_app/features/checkout/presentation/screens/checkout_page.dart';
+import 'package:marketi_app/features/home/presentation/screens/home_page.dart';
+import 'package:marketi_app/features/home/presentation/screens/home_pages/all_category_brands_page.dart';
+import 'package:marketi_app/features/home/presentation/screens/home_pages/all_products_page.dart';
+import 'package:marketi_app/features/home/presentation/screens/product_page.dart';
+import 'package:marketi_app/features/onboarding/presentation/screens/onbourding_screen.dart';
+import 'package:marketi_app/features/profile/presentation/cubit/profile_cubit.dart';
+import 'package:marketi_app/features/profile/presentation/screens/profile_page.dart';
 
 class AppRouterService {
   final AppStateService appStateService;
@@ -100,39 +100,44 @@ class AppRouterService {
 
         GoRoute(
           path: AppRoutes.home,
-          builder: (context, state) => MultiBlocProvider(
-            providers: [
-              BlocProvider(
-                create: (context) =>
-                    HomeCubit(homeRepository: serviceLocator()),
-              ),
-              BlocProvider(
-                create: (context) =>
-                    AddProductCubit(cartRepository: serviceLocator()),
-              ),
-              BlocProvider(
-                create: (context) =>
-                    GetProductsCubit(cartRepository: serviceLocator()),
-              ),
-              BlocProvider(
-                create: (context) =>
-                    DeleteProductCubit(cartRepository: serviceLocator()),
-              ),
-              BlocProvider(
-                create: (context) =>
-                    AddFavouriteCubit(favouriteRepository: serviceLocator()),
-              ),
-              BlocProvider(
-                create: (context) =>
-                    DeleteFavouriteCubit(favouriteRepository: serviceLocator()),
-              ),
-              BlocProvider(
-                create: (context) =>
-                    GetFavouriteCubit(favouriteRepository: serviceLocator()),
-              ),
-            ],
-            child: const HomePage(),
-          ),
+          builder: (context, state) {
+            var index = state.extra as int?;
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider(
+                  create: (context) =>
+                      HomeCubit(homeRepository: serviceLocator()),
+                ),
+                BlocProvider(
+                  create: (context) =>
+                      AddProductCubit(cartRepository: serviceLocator()),
+                ),
+                BlocProvider(
+                  create: (context) =>
+                      GetProductsCubit(cartRepository: serviceLocator()),
+                ),
+                BlocProvider(
+                  create: (context) =>
+                      DeleteProductCubit(cartRepository: serviceLocator()),
+                ),
+                BlocProvider(
+                  create: (context) =>
+                      AddFavouriteCubit(favouriteRepository: serviceLocator()),
+                ),
+                BlocProvider(
+                  create: (context) => DeleteFavouriteCubit(
+                    favouriteRepository: serviceLocator(),
+                  ),
+                ),
+                BlocProvider(
+                  create: (context) =>
+                      GetFavouriteCubit(favouriteRepository: serviceLocator()),
+                ),
+              ],
+
+              child: HomePage(currentIndex: index ?? 0),
+            );
+          },
         ),
 
         GoRoute(

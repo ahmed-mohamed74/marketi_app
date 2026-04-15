@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/routing/app_state_service.dart';
 import 'package:marketi_app/core/themes/app_theme.dart';
-import 'package:marketi_app/features/onboarding_feature/presentation/cubit/onbourd_cubit.dart';
+import 'package:marketi_app/features/onboarding/presentation/cubit/onbourd_cubit.dart';
 import 'package:marketi_app/core/services/service_locator.dart';
 
 class MyApp extends StatelessWidget {
