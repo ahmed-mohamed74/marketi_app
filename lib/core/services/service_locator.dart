@@ -7,15 +7,15 @@ import 'package:marketi_app/core/api/dio_consumer.dart';
 import 'package:marketi_app/core/network/connection_checker.dart';
 import 'package:marketi_app/core/routing/app_state_service.dart';
 import 'package:marketi_app/core/services/cache/product_local_data_source.dart';
-import 'package:marketi_app/features/auth_feature/data/repositories/auth_repository.dart';
-import 'package:marketi_app/features/home_feature/data/models/brand_model.dart';
-import 'package:marketi_app/features/home_feature/data/models/category_model.dart';
-import 'package:marketi_app/features/home_feature/data/models/category_name_model.dart';
-import 'package:marketi_app/features/home_feature/data/models/product_model.dart';
-import 'package:marketi_app/features/home_feature/data/repositories/cart_repository.dart';
-import 'package:marketi_app/features/home_feature/data/repositories/favourite_repository.dart';
-import 'package:marketi_app/features/home_feature/data/repositories/home_repository.dart';
-import 'package:marketi_app/features/profile_feature/data/repositories/profile_repository.dart';
+import 'package:marketi_app/features/auth/data/repositories/auth_repository.dart';
+import 'package:marketi_app/features/home/data/models/brand_model.dart';
+import 'package:marketi_app/features/home/data/models/category_model.dart';
+import 'package:marketi_app/features/home/data/models/category_name_model.dart';
+import 'package:marketi_app/features/home/data/models/product_model.dart';
+import 'package:marketi_app/features/cart/data/repositories/cart_repository.dart';
+import 'package:marketi_app/features/favorite/data/repositories/favourite_repository.dart';
+import 'package:marketi_app/features/home/data/repositories/home_repository.dart';
+import 'package:marketi_app/features/profile/data/repositories/profile_repository.dart';
 
 final serviceLocator = GetIt.instance;
 

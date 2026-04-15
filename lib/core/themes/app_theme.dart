@@ -1,18 +1,66 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 
 class AppTheme {
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
+    fontFamily: 'Poppins',
 
-    /// 🔤 FONT
-    fontFamily: GoogleFonts.poppins().fontFamily,
-    textTheme: GoogleFonts.poppinsTextTheme().copyWith(
-      displayLarge: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-      titleLarge: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-      bodyMedium: const TextStyle(fontSize: 14),
-      bodySmall: const TextStyle(fontSize: 12),
+    textTheme: const TextTheme(
+      // Heading 1
+      displayMedium: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: AppColors.darkBlueColor,
+      ),
+      // Heading 2
+      titleMedium: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: AppColors.darkBlueColor,
+      ),
+      // Heading 3
+      titleSmall: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: AppColors.darkBlueColor,
+      ),
+      // AppBarTitle
+      titleLarge: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w500,
+        color: AppColors.darkBlueColor,
+      ),
+      // Body Large
+      bodyLarge: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.w500,
+        color: AppColors.darkBlueColor,
+      ),
+      // Body Medium
+      bodyMedium: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+        color: AppColors.darkBlueColor,
+      ),
+      // Body Small
+      bodySmall: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+        color: AppColors.darkBlueColor,
+      ),
+      // Body Text
+      labelLarge: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: AppColors.navyColor,
+      ),
+      // Hint Text
+      labelSmall: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+        color: AppColors.greyScaleColor,
+      ),
     ),
 
     /// 🎨 COLORS
@@ -34,6 +82,7 @@ class AppTheme {
       centerTitle: true,
       iconTheme: IconThemeData(color: AppColors.darkBlueColor),
       titleTextStyle: TextStyle(
+        fontFamily: 'Poppins',
         color: AppColors.darkBlueColor,
         fontSize: 18,
         fontWeight: FontWeight.w600,
@@ -42,14 +91,31 @@ class AppTheme {
 
     /// 🔘 ELEVATED BUTTON
     elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryColor,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        minimumSize: const Size(double.infinity, 50),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-      ),
+      style:
+          ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primaryColor,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            minimumSize: const Size(double.infinity, 50),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            textStyle: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          ).copyWith(
+            backgroundColor: WidgetStateProperty.resolveWith<Color?>((
+              Set<WidgetState> states,
+            ) {
+              if (states.contains(WidgetState.disabled)) {
+                return AppColors.greyScaleColor;
+              }
+              return AppColors.primaryColor;
+            }),
+          ),
     ),
 
     /// 🔳 OUTLINED BUTTON
@@ -59,7 +125,11 @@ class AppTheme {
         minimumSize: const Size(double.infinity, 50),
         side: const BorderSide(color: AppColors.primaryColor),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        textStyle: const TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     ),
 
@@ -67,7 +137,11 @@ class AppTheme {
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: AppColors.primaryColor,
-        textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+        textStyle: const TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     ),
 
@@ -92,7 +166,11 @@ class AppTheme {
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: AppColors.darkRedColor),
       ),
-      hintStyle: const TextStyle(color: AppColors.greyScaleColor, fontSize: 14),
+      hintStyle: const TextStyle(
+        fontFamily: 'Poppins',
+        color: AppColors.greyScaleColor,
+        fontSize: 14,
+      ),
     ),
 
     /// ☑️ CHECKBOX
@@ -131,7 +209,10 @@ class AppTheme {
     /// 🔔 SNACKBAR
     snackBarTheme: SnackBarThemeData(
       backgroundColor: AppColors.darkBlueColor,
-      contentTextStyle: const TextStyle(color: Colors.white),
+      contentTextStyle: const TextStyle(
+        fontFamily: 'Poppins',
+        color: Colors.white,
+      ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       behavior: SnackBarBehavior.floating,
     ),
