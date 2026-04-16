@@ -47,8 +47,6 @@ class _AllCategoryBrandsPageState extends State<AllCategoryBrandsPage> {
                 });
               },
               child: CircleAvatar(
-                backgroundColor: AppColors.lightBlueColor,
-                foregroundColor: AppColors.navyColor,
                 child: Icon(Icons.person_2_outlined, size: 30),
               ),
             ),

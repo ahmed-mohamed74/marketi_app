@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/routing/app_routes.dart';
+import 'package:marketi_app/features/home/presentation/cubits/theme_cubit/theme_cubit.dart';
 import 'package:skeletonizer/skeletonizer.dart'; // Add this
 
 import 'package:marketi_app/core/constants/asset_images.dart';
@@ -63,7 +64,6 @@ class _ProfilePageState extends State<ProfilePage> {
                             children: [
                               CircleAvatar(
                                 radius: 50,
-                                backgroundColor: AppColors.lightBlueColor,
                                 child: ClipOval(
                                   child: userImage.isNotEmpty
                                       ? Image.network(
@@ -121,11 +121,23 @@ class _ProfilePageState extends State<ProfilePage> {
                       trailingWidget: Switch(value: true, onChanged: (v) {}),
                       onTab: () {},
                     ),
-                    ListTileWidget(
-                      leadingIcon: Icons.mode_night_outlined,
-                      title: 'Dark Mode',
-                      trailingWidget: Switch(value: false, onChanged: (v) {}),
-                      onTab: () {},
+                    BlocBuilder<ThemeCubit, ThemeMode>(
+                      builder: (context, state) {
+                        bool isDarkMode = state == ThemeMode.dark;
+                        return ListTileWidget(
+                          leadingIcon: Icons.mode_night_outlined,
+                          title: 'Dark Mode',
+                          trailingWidget: Switch(
+                            value: isDarkMode,
+                            onChanged: (value) {
+                              context.read<ThemeCubit>().toggleTheme(value);
+                            },
+                          ),
+                          onTab: () {
+                            context.read<ThemeCubit>().toggleTheme(!isDarkMode);
+                          },
+                        );
+                      },
                     ),
                     _buildItem(Icons.star_border_outlined, 'Rate Us', () {}),
                     _buildItem(
@@ -145,11 +157,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildPlaceholder() {
-    return const Icon(
-      Icons.person_outline,
-      size: 60,
-      color: AppColors.navyColor,
-    );
+    return const Icon(Icons.person_outline, size: 60);
   }
 
   Widget _buildItem(IconData icon, String title, VoidCallback onTab) {
