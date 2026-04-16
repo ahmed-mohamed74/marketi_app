@@ -125,7 +125,7 @@
   <td><img width="200" src="assets/read_me_images/dark_home.jpeg" /></td>
   <td><img width="200" src="assets/read_me_images/dar_home_loading.jpeg" /></td>
   <td><img width="200" src="assets/read_me_images/dark_search.jpeg" /></td>
-  <td><img width="200" src="assets/read_me_images/dark_profile.jpeg" /></td>
+  <td><img width="200" src="assets/read_me_images/dark_profile1.jpeg" /></td>
 </tr>
 <tr>
   <td>Home Screen</td>
