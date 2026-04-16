@@ -1,11 +1,8 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:marketi_app/core/api/end_points.dart';
 import 'package:marketi_app/core/routing/app_routes.dart';
-import 'package:marketi_app/core/services/cache/cache_helper.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/features/cart/presentation/cart_cubits/add_product_cubit/add_product_cubit.dart';
 import 'package:marketi_app/features/favorite/presentation/favourite_cubits/add_favourite_cubit/add_favourite_cubit.dart';

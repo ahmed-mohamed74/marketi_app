@@ -44,8 +44,6 @@ class HomePage extends StatelessWidget {
               child: GestureDetector(
                 onTap: () => context.read<NavigationCubit>().updateIndex(3),
                 child: CircleAvatar(
-                  backgroundColor: AppColors.lightBlueColor,
-                  foregroundColor: AppColors.navyColor,
                   child: const Icon(Icons.person_2_outlined, size: 30),
                 ),
               ),
@@ -58,15 +56,23 @@ class HomePage extends StatelessWidget {
           body: pages[currentIndex],
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: currentIndex,
-            selectedItemColor: AppColors.primaryColor,
-            unselectedItemColor: AppColors.greyScaleColor,
             type: BottomNavigationBarType.fixed,
-            onTap: (index) => context.read<NavigationCubit>().updateIndex(index),
+            onTap: (index) =>
+                context.read<NavigationCubit>().updateIndex(index),
             items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Home'),
-              BottomNavigationBarItem(icon: Icon(Icons.shopping_cart_outlined), label: 'Cart'),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.shopping_cart_outlined),
+                label: 'Cart',
+              ),
               BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Fav'),
-              BottomNavigationBarItem(icon: Icon(Icons.person_2_outlined), label: 'Profile'),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person_2_outlined),
+                label: 'Profile',
+              ),
             ],
           ),
         );
@@ -76,10 +82,14 @@ class HomePage extends StatelessWidget {
 
   String _getAppBarTitle(int index, String userName) {
     switch (index) {
-      case 0: return 'Hi $userName !';
-      case 1: return 'Cart';
-      case 2: return 'Favorites';
-      default: return 'My Profile';
+      case 0:
+        return 'Hi $userName !';
+      case 1:
+        return 'Cart';
+      case 2:
+        return 'Favorites';
+      default:
+        return 'My Profile';
     }
   }
 }

@@ -30,7 +30,7 @@ class OrderSummaryCard extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 5.0),
             child: Text(
-              '- - - - - - - - - - - - - - - - - - - - - - - -',
+              '- - - - - - - - - - - - - - - - - - - - -',
               style: TextStyle(color: AppColors.lightBlueColor),
             ),
           ),

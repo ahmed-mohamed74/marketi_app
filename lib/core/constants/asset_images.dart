@@ -1,5 +1,5 @@
 class AssetImages {
-  static String marketiLogo = 'assets/images/marketi_logo.png';
+  static String marketiLogo = 'assets/images/om_logo.png';
   static String specialOfferPanner = 'assets/images/special_offer_panner.jpg';
   static String onboardingImage1 =
       'assets/images/onboarding_images/onboarding_image1.png';
@@ -20,5 +20,4 @@ class AssetImages {
   static String product1Image = 'assets/images/product1_image.png';
   static String product2Image = 'assets/images/product2_image.png';
   static String categoryImage = 'assets/images/categoryImage.jpg';
-  
 }
