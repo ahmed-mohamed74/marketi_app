@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:marketi_app/core/routing/app_routes.dart';
 import 'package:skeletonizer/skeletonizer.dart'; // Add this
 
 import 'package:marketi_app/core/constants/asset_images.dart';
@@ -29,7 +31,6 @@ class _ProfilePageState extends State<ProfilePage> {
       builder: (context, state) {
         final bool isLoading = state is ProfileLoading;
 
-        // 1. Extract data or provide MOCK data for the Skeletonizer bones
         final user = (state is ProfileSuccess) ? state.user : null;
 
         final userName = isLoading
@@ -70,19 +71,23 @@ class _ProfilePageState extends State<ProfilePage> {
                                           width: 100,
                                           height: 100,
                                           fit: BoxFit.cover,
-                                          errorBuilder: (_, __, ___) =>
+                                          errorBuilder: (_, _, _) =>
                                               _buildPlaceholder(),
                                         )
                                       : _buildPlaceholder(),
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              Text(userName, style: Theme.of(context).textTheme.displayMedium),
+                              Text(
+                                userName,
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.displayMedium,
+                              ),
                               Text(
                                 userHandle,
-                                style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                                  color: AppColors.greyScaleColor,
-                                ),
+                                style: Theme.of(context).textTheme.titleSmall!
+                                    .copyWith(color: AppColors.greyScaleColor),
                               ),
                             ],
                           ),
@@ -98,21 +103,37 @@ class _ProfilePageState extends State<ProfilePage> {
                       ? const NeverScrollableScrollPhysics()
                       : const BouncingScrollPhysics(),
                   children: [
-                    _buildItem(Icons.person_2_outlined, 'Account Preferences'),
-                    _buildItem(Icons.payment, 'Subscription & Payment'),
+                    _buildItem(
+                      Icons.person_2_outlined,
+                      'Account Preferences',
+                      () {},
+                    ),
+                    _buildItem(
+                      Icons.receipt_long_outlined,
+                      'Orders History',
+                      () {
+                        context.push(AppRoutes.orderHistoryPage);
+                      },
+                    ),
                     ListTileWidget(
                       leadingIcon: Icons.notifications_active_outlined,
                       title: 'App Notifications',
                       trailingWidget: Switch(value: true, onChanged: (v) {}),
+                      onTab: () {},
                     ),
                     ListTileWidget(
                       leadingIcon: Icons.mode_night_outlined,
                       title: 'Dark Mode',
                       trailingWidget: Switch(value: false, onChanged: (v) {}),
+                      onTab: () {},
                     ),
-                    _buildItem(Icons.star_border_outlined, 'Rate Us'),
-                    _buildItem(Icons.feedback_outlined, 'Provide Feedback'),
-                    _buildItem(Icons.logout_outlined, 'Log Out'),
+                    _buildItem(Icons.star_border_outlined, 'Rate Us', () {}),
+                    _buildItem(
+                      Icons.feedback_outlined,
+                      'Provide Feedback',
+                      () {},
+                    ),
+                    _buildItem(Icons.logout_outlined, 'Log Out', () {}),
                   ],
                 ),
               ),
@@ -131,7 +152,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildItem(IconData icon, String title) {
+  Widget _buildItem(IconData icon, String title, VoidCallback onTab) {
     return ListTileWidget(
       leadingIcon: icon,
       title: title,
@@ -139,6 +160,7 @@ class _ProfilePageState extends State<ProfilePage> {
         onPressed: () {},
         icon: const Icon(Icons.keyboard_arrow_right),
       ),
+      onTab: onTab,
     );
   }
 }

@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/routing/app_routes.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/features/home/data/models/product_model.dart';
-import 'package:marketi_app/features/home/presentation/home_cubit/home_cubit.dart';
+import 'package:marketi_app/features/home/presentation/cubits/home_cubit/home_cubit.dart';
 class SearchSectionWidget extends StatelessWidget {
   final List<ProductModel> products;
   const SearchSectionWidget({super.key, required this.products});

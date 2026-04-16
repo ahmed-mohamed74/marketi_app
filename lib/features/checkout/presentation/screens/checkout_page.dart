@@ -10,18 +10,15 @@ import 'package:marketi_app/features/checkout/presentation/widgets/address_card.
 import 'package:marketi_app/features/checkout/presentation/widgets/info_tile.dart';
 import 'package:marketi_app/features/checkout/presentation/widgets/order_summery_card.dart';
 import 'package:marketi_app/features/checkout/presentation/widgets/voucher_section.dart';
+import 'package:marketi_app/features/home/presentation/cubits/navigation_cubit/navigation_cubit.dart';
+import 'package:marketi_app/features/order/data/models/order_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 enum PaymentMethod { cash, card }
 
 class CheckoutPage extends StatefulWidget {
-  final double? amount;
-  final int? suptotalItems;
-  const CheckoutPage({
-    super.key,
-    required this.amount,
-    required this.suptotalItems,
-  });
+  final OrderModel? orderModel;
+  const CheckoutPage({super.key, required this.orderModel});
 
   @override
   State<CheckoutPage> createState() => _CheckoutPageState();
@@ -43,7 +40,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
             child: GestureDetector(
               onTap: () {
                 setState(() {
-                  context.push(AppRoutes.home, extra: 3);
+                  context.read<NavigationCubit>().updateIndex(3);
+                  context.push(AppRoutes.home);
                 });
               },
               child: CircleAvatar(
@@ -89,8 +87,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
             const SectionTitle(title: 'Payment'),
             const SizedBox(height: 10),
             OrderSummaryCard(
-              suptotalItems: widget.suptotalItems ?? 0,
-              amount: widget.amount ?? 0,
+              suptotalItems: widget.orderModel?.products.length ?? 0,
+              amount: widget.orderModel?.totalPrice ?? 0,
             ),
             const SizedBox(height: 14),
             BlocConsumer<PaymentCubit, PaymentState>(
@@ -103,6 +101,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       ),
                     ),
                   );
+                }
+                if (state is PaymentSuccess) {
+                  context.read<PaymentCubit>().saveOrder(widget.orderModel!);
+                }
+                if (state is SaveOrderSuccess) {
+                  context.push(AppRoutes.orderHistoryPage);
                 }
               },
               builder: (context, state) {
@@ -118,11 +122,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   onPressed: () {
                     if (selectedMethod == PaymentMethod.card) {
                       context.read<PaymentCubit>().makePayment(
-                        widget.amount!.round(),
+                        widget.orderModel!.totalPrice.round(),
                         "EGP",
                       );
                     } else {
                       _sendWhatsAppOrder();
+                      context.read<PaymentCubit>().saveOrder(
+                        widget.orderModel!,
+                      );
                     }
                   },
                 );
@@ -140,8 +147,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
         StripeKeys.companyPhoneNumber; // Your company number
     final String message =
         "Hello Marketi! I'd like to confirm my order:\n"
-        "Total Items: ${widget.suptotalItems}\n"
-        "Total Amount: EGP ${(widget.amount! + 10).round()}\n"
+        "Total Items: ${widget.orderModel?.products.length??0}\n"
+        "Total Amount: EGP ${(widget.orderModel?.totalPrice??0 + 10).round()}\n"
         "Payment Method: Cash on Delivery\n"
         "Address: Anshas, Al-sharqia, Egypt.";
 

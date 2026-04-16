@@ -18,3 +18,13 @@ final class PaymentFailure extends PaymentState {
 
   const PaymentFailure({required this.errorMessage});
 }
+
+final class SaveOrderLoading extends PaymentState {}
+
+final class SaveOrderSuccess extends PaymentState {}
+
+final class SaveOrderFailure extends PaymentState {
+  final String errorMessage;
+
+  const SaveOrderFailure({required this.errorMessage});
+}

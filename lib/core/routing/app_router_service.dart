@@ -19,7 +19,7 @@ import 'package:marketi_app/features/cart/presentation/cart_cubits/get_product_c
 import 'package:marketi_app/features/favorite/presentation/favourite_cubits/add_favourite_cubit/add_favourite_cubit.dart';
 import 'package:marketi_app/features/favorite/presentation/favourite_cubits/delete_favourite_cubit/delete_favourite_cubit.dart';
 import 'package:marketi_app/features/favorite/presentation/favourite_cubits/get_favourites_cubit/get_favourites_cubit.dart';
-import 'package:marketi_app/features/home/presentation/home_cubit/home_cubit.dart';
+import 'package:marketi_app/features/home/presentation/cubits/home_cubit/home_cubit.dart';
 import 'package:marketi_app/features/checkout/presentation/payment_cubit/payment_cubit.dart';
 import 'package:marketi_app/features/home/presentation/screens/brand_page.dart';
 import 'package:marketi_app/features/home/presentation/screens/category_page.dart';
@@ -29,6 +29,9 @@ import 'package:marketi_app/features/home/presentation/screens/home_pages/all_ca
 import 'package:marketi_app/features/home/presentation/screens/home_pages/all_products_page.dart';
 import 'package:marketi_app/features/home/presentation/screens/product_page.dart';
 import 'package:marketi_app/features/onboarding/presentation/screens/onbourding_screen.dart';
+import 'package:marketi_app/features/order/data/models/order_model.dart';
+import 'package:marketi_app/features/order/presentation/cubit/order_cubit.dart';
+import 'package:marketi_app/features/order/presentation/screens/order_history.dart';
 import 'package:marketi_app/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:marketi_app/features/profile/presentation/screens/profile_page.dart';
 
@@ -101,7 +104,6 @@ class AppRouterService {
         GoRoute(
           path: AppRoutes.home,
           builder: (context, state) {
-            var index = state.extra as int?;
             return MultiBlocProvider(
               providers: [
                 BlocProvider(
@@ -133,9 +135,10 @@ class AppRouterService {
                   create: (context) =>
                       GetFavouriteCubit(favouriteRepository: serviceLocator()),
                 ),
+                
               ],
 
-              child: HomePage(currentIndex: index ?? 0),
+              child: HomePage(),
             );
           },
         ),
@@ -286,19 +289,24 @@ class AppRouterService {
         GoRoute(
           path: AppRoutes.checkoutPage,
           builder: (context, state) {
-            final data = state.extra as Map<String, dynamic>?;
-
-            final amount = data?['amount'] as double?;
-            final suptotalItems = data?['suptotalItems'] as int?;
+            final order = state.extra as OrderModel?;
 
             return BlocProvider(
-              create: (context) => PaymentCubit(),
+              create: (context) =>
+                  PaymentCubit(orderLocalService: serviceLocator()),
               child: CheckoutPage(
-                amount: amount ?? 0.0,
-                suptotalItems: suptotalItems,
+                orderModel: order,
               ),
             );
           },
+        ),
+        GoRoute(
+          path: AppRoutes.orderHistoryPage,
+          builder: (context, state) => BlocProvider(
+            create: (context) =>
+                OrderCubit(orderLocalService: serviceLocator()),
+            child: const OredrHistory(),
+          ),
         ),
       ],
 

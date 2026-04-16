@@ -89,6 +89,29 @@ class AppTheme {
       ),
     ),
 
+    /// 📱 LIST TILE
+    listTileTheme: ListTileThemeData(
+      iconColor: AppColors.darkBlueColor,
+      tileColor: Colors.transparent,
+      selectedTileColor: AppColors.lightBlueColor.withValues(alpha: 0.1),
+      titleTextStyle: const TextStyle(
+        fontFamily: 'Poppins',
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+        color: AppColors.darkBlueColor,
+      ),
+      subtitleTextStyle: const TextStyle(
+        fontFamily: 'Poppins',
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+        color: AppColors.greyScaleColor,
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      horizontalTitleGap: 12,
+      minLeadingWidth: 0,
+    ),
+
     /// 🔘 ELEVATED BUTTON
     elevatedButtonTheme: ElevatedButtonThemeData(
       style:
