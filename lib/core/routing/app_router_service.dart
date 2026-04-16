@@ -135,7 +135,6 @@ class AppRouterService {
                   create: (context) =>
                       GetFavouriteCubit(favouriteRepository: serviceLocator()),
                 ),
-                
               ],
 
               child: HomePage(),
@@ -294,9 +293,7 @@ class AppRouterService {
             return BlocProvider(
               create: (context) =>
                   PaymentCubit(orderLocalService: serviceLocator()),
-              child: CheckoutPage(
-                orderModel: order,
-              ),
+              child: CheckoutPage(orderModel: order),
             );
           },
         ),
@@ -315,32 +312,29 @@ class AppRouterService {
         final isLoggedIn = appStateService.getLoggedIn();
         final location = state.matchedLocation;
 
-        // Always allow onboarding, login, signup, and reset pages without redirecting
-        const allowedWithoutRedirect = [
-          AppRoutes.onboarding,
-          AppRoutes.login,
-          AppRoutes.signUp,
-          AppRoutes.resetPage,
-        ];
+        final bool isAuthPage =
+            location == AppRoutes.login ||
+            location == AppRoutes.signUp ||
+            location == AppRoutes.resetPage ||
+            location == AppRoutes.verificationPage ||
+            location == AppRoutes.newPasswordPage;
 
-        // 1️⃣ First time → onboarding
-        if (isFirstTime && location != AppRoutes.onboarding) {
-          return AppRoutes.onboarding;
+        final bool isOnboardingPage = location == AppRoutes.onboarding;
+
+        if (isFirstTime) {
+          return isOnboardingPage ? null : AppRoutes.onboarding;
         }
 
-        // 2️⃣ Not logged in → login (unless on allowed pages)
-        if (!isFirstTime &&
-            !isLoggedIn &&
-            !allowedWithoutRedirect.contains(location)) {
+        if (!isLoggedIn) {
+          if (isAuthPage || isOnboardingPage) return null;
           return AppRoutes.login;
         }
 
-        // 3️⃣ Logged in → home (cannot go to auth/onboarding pages)
-        if (isLoggedIn && allowedWithoutRedirect.contains(location)) {
+        if (isLoggedIn && (isAuthPage || isOnboardingPage)) {
           return AppRoutes.home;
         }
 
-        return null; // no redirect
+        return null; 
       },
     );
   }

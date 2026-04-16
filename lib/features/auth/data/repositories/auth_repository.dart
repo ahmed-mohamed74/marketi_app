@@ -158,4 +158,9 @@ class AuthRepository {
       return Left('Auth Confirm Reset Password failure: ${e.toString()}');
     }
   }
+  Future<void> signOut() async {
+  await CacheHelper().removeData(key: ApiKey.token);
+  await CacheHelper().removeData(key: ApiKey.id);
+  await CacheHelper().removeData(key: ApiKey.user);
+}
 }

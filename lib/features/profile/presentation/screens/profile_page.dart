@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/routing/app_routes.dart';
+import 'package:marketi_app/core/routing/app_state_service.dart';
+import 'package:marketi_app/core/services/service_locator.dart';
+import 'package:marketi_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:marketi_app/features/home/presentation/cubits/theme_cubit/theme_cubit.dart';
 import 'package:skeletonizer/skeletonizer.dart'; // Add this
 
@@ -121,20 +124,31 @@ class _ProfilePageState extends State<ProfilePage> {
                       trailingWidget: Switch(value: true, onChanged: (v) {}),
                       onTab: () {},
                     ),
-                    BlocBuilder<ThemeCubit, ThemeMode>(
+                    BlocConsumer<AuthBloc, AuthState>(
+                      listener: (context, state) {
+                        if (state is AuthInitial) {
+                          serviceLocator<AppStateService>().updateAuthState();
+                        }
+                      },
                       builder: (context, state) {
-                        bool isDarkMode = state == ThemeMode.dark;
-                        return ListTileWidget(
-                          leadingIcon: Icons.mode_night_outlined,
-                          title: 'Dark Mode',
-                          trailingWidget: Switch(
-                            value: isDarkMode,
-                            onChanged: (value) {
-                              context.read<ThemeCubit>().toggleTheme(value);
-                            },
-                          ),
-                          onTab: () {
-                            context.read<ThemeCubit>().toggleTheme(!isDarkMode);
+                        return BlocBuilder<ThemeCubit, ThemeMode>(
+                          builder: (context, state) {
+                            bool isDarkMode = state == ThemeMode.dark;
+                            return ListTileWidget(
+                              leadingIcon: Icons.mode_night_outlined,
+                              title: 'Dark Mode',
+                              trailingWidget: Switch(
+                                value: isDarkMode,
+                                onChanged: (value) {
+                                  context.read<ThemeCubit>().toggleTheme(value);
+                                },
+                              ),
+                              onTab: () {
+                                context.read<ThemeCubit>().toggleTheme(
+                                  !isDarkMode,
+                                );
+                              },
+                            );
                           },
                         );
                       },
@@ -145,7 +159,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       'Provide Feedback',
                       () {},
                     ),
-                    _buildItem(Icons.logout_outlined, 'Log Out', () {}),
+                    _buildItem(Icons.logout_outlined, 'Log Out', () async{
+                      context.read<AuthBloc>().add(AuthLogout());
+                      await Future.delayed(const Duration(milliseconds: 100));
+                      serviceLocator<AppStateService>().updateAuthState();
+                    }),
                   ],
                 ),
               ),
