@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:marketi_app/features/home/data/models/product_model.dart';
+import 'package:marketi_app/features/order/data/models/order_model.dart';
 import 'package:skeletonizer/skeletonizer.dart'; // Added Import
 import 'package:marketi_app/core/routing/app_routes.dart';
 import 'package:marketi_app/core/themes/colors.dart';
@@ -119,7 +121,6 @@ class _CartScreenState extends State<CartScreen> {
                           physics: const BouncingScrollPhysics(),
                           itemCount: cartProducts.length,
                           itemBuilder: (context, index) {
-                            // If loading, we pass fake strings to the widget
                             dynamic product = isLoading
                                 ? null
                                 : cartProducts[index];
@@ -176,7 +177,9 @@ class _CartScreenState extends State<CartScreen> {
                     ),
                     _buildCheckoutSection(
                       totalAmount,
-                      cartProducts.length,
+                      isLoading
+                          ? []
+                          : (state as GetCartProductsSuccess).cartProducts,
                       isLoading,
                     ),
                   ],
@@ -209,7 +212,11 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  Widget _buildCheckoutSection(double total, int itemCount, bool isLoading) {
+  Widget _buildCheckoutSection(
+    double total,
+    List<dynamic> products,
+    bool isLoading,
+  ) {
     return Card(
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -221,7 +228,7 @@ class _CartScreenState extends State<CartScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Subtotal ($itemCount items)',
+                  'Subtotal (${products.length} items)',
                   style: Theme.of(context).textTheme.titleSmall,
                 ),
                 Text(
@@ -232,15 +239,22 @@ class _CartScreenState extends State<CartScreen> {
             ),
             const SizedBox(height: 14),
             ElevatedButton(
-              onPressed: isLoading
-                  ? () {}
+              onPressed: isLoading || products.isEmpty
+                  ? null
                   : () {
-                      context.push(
-                        AppRoutes.checkoutPage,
-                        extra: {'amount': total, 'suptotalItems': itemCount},
+                      final List<ProductModel> cartProductsList = products
+                          .cast<ProductModel>()
+                          .toList();
+
+                      final order = OrderModel(
+                        id: DateTime.now().millisecondsSinceEpoch.toString(),
+                        products: cartProductsList,
+                        totalPrice: total,
+                        date: DateTime.now(),
                       );
+                      context.push(AppRoutes.checkoutPage, extra: order);
                     },
-              child: Text('Checkout'),
+              child: const Text('Checkout'),
             ),
           ],
         ),

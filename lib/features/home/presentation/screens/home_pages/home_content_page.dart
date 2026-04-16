@@ -13,7 +13,7 @@ import 'package:marketi_app/features/favorite/presentation/favourite_cubits/get_
 import 'package:marketi_app/features/home/data/models/brand_model.dart';
 import 'package:marketi_app/features/home/data/models/category_model.dart';
 import 'package:marketi_app/features/home/data/models/product_model.dart';
-import 'package:marketi_app/features/home/presentation/home_cubit/home_cubit.dart';
+import 'package:marketi_app/features/home/presentation/cubits/home_cubit/home_cubit.dart';
 import 'package:marketi_app/features/home/presentation/widgets/carousel_slider_widget.dart';
 import 'package:marketi_app/features/home/presentation/widgets/category_section_widget.dart';
 import 'package:marketi_app/features/home/presentation/widgets/popular_product_section_widget.dart';

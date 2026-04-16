@@ -15,6 +15,8 @@ import 'package:marketi_app/features/home/data/models/product_model.dart';
 import 'package:marketi_app/features/cart/data/repositories/cart_repository.dart';
 import 'package:marketi_app/features/favorite/data/repositories/favourite_repository.dart';
 import 'package:marketi_app/features/home/data/repositories/home_repository.dart';
+import 'package:marketi_app/features/order/data/models/order_model.dart';
+import 'package:marketi_app/features/order/data/repositories/order_local_service.dart';
 import 'package:marketi_app/features/profile/data/repositories/profile_repository.dart';
 
 final serviceLocator = GetIt.instance;
@@ -30,6 +32,7 @@ Future<void> serviceLocatorInit() async {
   Hive.registerAdapter(CategoryModelAdapter());
   Hive.registerAdapter(BrandModelAdapter());
   Hive.registerAdapter(CategoryNameModelAdapter());
+  Hive.registerAdapter(OrderModelAdapter());
 
   // 3. Open the Box
   // We open it here so it's ready to be injected as a Singleton
@@ -41,6 +44,7 @@ Future<void> serviceLocatorInit() async {
   );
   var cartProductBox = await Hive.openBox<ProductModel>('cartProducts');
   var favProductBox = await Hive.openBox<ProductModel>('favProducts');
+  var ordersBox = await Hive.openBox<OrderModel>('orders_box');
 
   // 4. Register the Box in GetIt
   serviceLocator.registerLazySingleton<Box<ProductModel>>(
@@ -61,6 +65,7 @@ Future<void> serviceLocatorInit() async {
     () => favProductBox,
     instanceName: 'favBox',
   );
+  serviceLocator.registerLazySingleton<Box<OrderModel>>(() => ordersBox);
 
   serviceLocator.registerFactory(() => InternetConnection());
   // Core
@@ -82,6 +87,7 @@ Future<void> serviceLocatorInit() async {
       favoriteBox: serviceLocator(instanceName: 'favBox'),
     ),
   );
+  serviceLocator.registerFactory<OrderLocalService>(() => OrderLocalService());
 
   // App State
   serviceLocator.registerLazySingleton(() => AppStateService());

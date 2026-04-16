@@ -16,4 +16,5 @@ class AppRoutes {
   static const brandPage = '/brandPage';
   static const profile = '/profile';
   static const checkoutPage = '/checkoutPage';
+  static const orderHistoryPage = '/orderHistoryPage';
 }

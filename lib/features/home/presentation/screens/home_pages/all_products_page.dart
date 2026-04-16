@@ -6,7 +6,8 @@ import 'package:marketi_app/features/favorite/presentation/favourite_cubits/add_
 import 'package:marketi_app/features/favorite/presentation/favourite_cubits/delete_favourite_cubit/delete_favourite_cubit.dart';
 import 'package:marketi_app/features/favorite/presentation/favourite_cubits/get_favourites_cubit/get_favourites_cubit.dart';
 import 'package:marketi_app/features/home/data/models/product_model.dart';
-import 'package:marketi_app/features/home/presentation/home_cubit/home_cubit.dart';
+import 'package:marketi_app/features/home/presentation/cubits/home_cubit/home_cubit.dart';
+import 'package:marketi_app/features/home/presentation/cubits/navigation_cubit/navigation_cubit.dart';
 import 'package:marketi_app/features/home/presentation/widgets/product_card_widget.dart';
 import 'package:marketi_app/features/home/presentation/widgets/search_section_widget.dart';
 import 'package:skeletonizer/skeletonizer.dart'; // Add this
@@ -65,7 +66,8 @@ class _AllProductsPageState extends State<AllProductsPage> {
             child: GestureDetector(
               onTap: () {
                 setState(() {
-                  context.push(AppRoutes.home, extra: 3);
+                  context.read<NavigationCubit>().updateIndex(3);
+                  context.go(AppRoutes.home);
                 });
               },
               child: CircleAvatar(
