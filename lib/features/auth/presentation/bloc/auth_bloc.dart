@@ -10,10 +10,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;
   bool isChecked = false;
   SignInModel? user;
-  void changeCheckBox(bool value) {
-    isChecked = value;
-    emit(AuthRememberMe());
-  }
 
   AuthBloc({required this.authRepository}) : super(AuthInitial()) {
     on<AuthLogin>((event, emit) async {
@@ -77,6 +73,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         (errorMessage) => emit(AuthFailure(errorMessage: errorMessage)),
         (message) => emit(AuthCreateNewPasswordSuccess()),
       );
+    });
+
+    on<AuthLogout>((event, emit) async {
+      await authRepository.signOut();
+      emit(AuthInitial());
     });
   }
 }

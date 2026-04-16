@@ -6,6 +6,7 @@ import 'package:marketi_app/core/api/end_points.dart';
 import 'package:marketi_app/core/services/cache/cache_helper.dart';
 import 'package:marketi_app/core/services/service_locator.dart';
 import 'package:marketi_app/core/themes/colors.dart';
+import 'package:marketi_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:marketi_app/features/cart/presentation/screens/cart_content.dart';
 import 'package:marketi_app/features/favorite/presentation/screens/favourites_content.dart';
 import 'package:marketi_app/features/home/presentation/cubits/navigation_cubit/navigation_cubit.dart';
@@ -22,8 +23,16 @@ class HomePage extends StatelessWidget {
       const HomeScreen(),
       const CartScreen(),
       const FavouriteScreen(),
-      BlocProvider(
-        create: (context) => ProfileCubit(profileRepository: serviceLocator()),
+      MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) =>
+                ProfileCubit(profileRepository: serviceLocator()),
+          ),
+          BlocProvider(
+            create: (context) => AuthBloc(authRepository: serviceLocator()),
+          ),
+        ],
         child: const ProfilePage(),
       ),
     ];

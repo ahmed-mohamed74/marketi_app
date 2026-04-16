@@ -2,7 +2,7 @@ class EndPoints {
   static String baseUrl = "https://supermarket-dan1.onrender.com/api/v1/";
   static String signIn = "auth/signIn";
   static String signUp = "auth/signUp";
-  static String resetPassword = "auth/sendPassEmail";
+  static String resetPassword = "auth/resetPassCode";
   static String verificationResetPass = "auth/activeResetPass";
   static String confirmResetPassword = "auth/resetPassword";
   static String getUesrData = "portfoilo/userData";
@@ -10,12 +10,14 @@ class EndPoints {
   static String getPopularProductsData = "home/productsFilter";
   static String getCategoriesData = "home/categories";
   static String getBrandsData = "home/brands";
-  static String getProductsByCategory(String categoryName){
-    return  "home/products/category/$categoryName";
+  static String getProductsByCategory(String categoryName) {
+    return "home/products/category/$categoryName";
   }
-  static String getProductsByBrand(String brandName){
-    return  "home/products/brand/$brandName";
+
+  static String getProductsByBrand(String brandName) {
+    return "home/products/brand/$brandName";
   }
+
   static String getCategoryNames = "home/categories/names";
   static String getSearchedData = "home/productsFilter";
   static String getCartProducts = "user/getCart";
@@ -25,7 +27,6 @@ class EndPoints {
   static String getFavouriteProducts = "user/getFavorite";
   static String addFavouriteProduct = "user/addFavorite";
   static String deleteFavouriteProduct = "user/deleteFavorite";
-
 }
 
 class ApiKey {

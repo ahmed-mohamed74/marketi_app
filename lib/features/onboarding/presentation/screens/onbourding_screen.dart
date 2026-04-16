@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/routing/app_routes.dart';
+import 'package:marketi_app/core/routing/app_state_service.dart';
+import 'package:marketi_app/core/services/service_locator.dart';
 import 'package:marketi_app/features/onboarding/presentation/cubit/onbourd_cubit.dart';
 import 'package:marketi_app/features/onboarding/data/lists/onbourd_list.dart';
 import 'package:marketi_app/features/onboarding/presentation/widgets/indicator.dart';
@@ -73,8 +75,8 @@ class OnbourdingScreen extends StatelessWidget {
                         curve: Curves.easeInOut,
                       );
                     } else {
-                      onboardCubit.completeOnboarding();
-                      GoRouter.of(context).go(AppRoutes.login);
+                      serviceLocator<AppStateService>().completeOnboarding();
+                      context.go(AppRoutes.login);
                     }
                   },
                 );
