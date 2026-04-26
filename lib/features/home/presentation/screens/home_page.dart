@@ -2,41 +2,39 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/api/end_points.dart';
 import 'package:marketi_app/core/services/cache/cache_helper.dart';
-import 'package:marketi_app/core/services/service_locator.dart';
-import 'package:marketi_app/core/themes/colors.dart';
-import 'package:marketi_app/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:marketi_app/features/cart/presentation/screens/cart_content.dart';
-import 'package:marketi_app/features/favorite/presentation/screens/favourites_content.dart';
-import 'package:marketi_app/features/home/presentation/cubits/navigation_cubit/navigation_cubit.dart';
-import 'package:marketi_app/features/home/presentation/screens/home_pages/home_content_page.dart';
+import 'package:marketi_app/features/cart/presentation/cart_cubits/get_product_cubit/get_products_cubit.dart';
+import 'package:marketi_app/features/favorite/presentation/favourite_cubits/get_favourites_cubit/get_favourites_cubit.dart';
+import 'package:marketi_app/features/home/presentation/cubits/home_cubit/home_cubit.dart';
 import 'package:marketi_app/features/profile/presentation/cubit/profile_cubit.dart';
-import 'package:marketi_app/features/profile/presentation/screens/profile_page.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class HomePage extends StatefulWidget {
+  final StatefulNavigationShell navigationShell;
+  const HomePage({super.key, required this.navigationShell});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    final cubit = context.read<HomeCubit>();
+    cubit.getPopularProducts();
+    cubit.getBestProducts();
+    cubit.getBuyAgainProducts();
+    cubit.getCategories();
+    cubit.getBrands();
+    context.read<GetFavouriteCubit>().getFavouriteProducts();
+    context.read<GetProductsCubit>().getCartProducts();
+    context.read<ProfileCubit>().getUserData();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> pages = [
-      const HomeScreen(),
-      const CartScreen(),
-      const FavouriteScreen(),
-      MultiBlocProvider(
-        providers: [
-          BlocProvider(
-            create: (context) =>
-                ProfileCubit(profileRepository: serviceLocator()),
-          ),
-          BlocProvider(
-            create: (context) => AuthBloc(authRepository: serviceLocator()),
-          ),
-        ],
-        child: const ProfilePage(),
-      ),
-    ];
-
     var userName = 'User';
     final userString = CacheHelper().getData(key: ApiKey.user);
     if (userString != null) {
@@ -44,30 +42,27 @@ class HomePage extends StatelessWidget {
       userName = userMap['name'];
     }
 
-    return BlocBuilder<NavigationCubit, int>(
-      builder: (context, currentIndex) {
-        return Scaffold(
+    return Scaffold(
           appBar: AppBar(
             leading: Padding(
               padding: const EdgeInsets.all(5.0),
               child: GestureDetector(
-                onTap: () => context.read<NavigationCubit>().updateIndex(3),
+                onTap: () => widget.navigationShell.goBranch(3),
                 child: CircleAvatar(
                   child: const Icon(Icons.person_2_outlined, size: 30),
                 ),
               ),
             ),
             title: Text(
-              _getAppBarTitle(currentIndex, userName),
+              _getAppBarTitle(widget.navigationShell.currentIndex, userName),
               style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
-          body: pages[currentIndex],
+          body: widget.navigationShell,
           bottomNavigationBar: BottomNavigationBar(
-            currentIndex: currentIndex,
+            currentIndex: widget.navigationShell.currentIndex,
             type: BottomNavigationBarType.fixed,
-            onTap: (index) =>
-                context.read<NavigationCubit>().updateIndex(index),
+            onTap: (index) => widget.navigationShell.goBranch(index),
             items: const [
               BottomNavigationBarItem(
                 icon: Icon(Icons.home_outlined),
@@ -85,8 +80,7 @@ class HomePage extends StatelessWidget {
             ],
           ),
         );
-      },
-    );
+      
   }
 
   String _getAppBarTitle(int index, String userName) {

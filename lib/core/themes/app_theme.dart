@@ -185,8 +185,9 @@ class AppTheme {
     /// ☑️ CHECKBOX & RADIO
     checkboxTheme: CheckboxThemeData(
       fillColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.selected))
+        if (states.contains(WidgetState.selected)) {
           return AppColors.primaryColor;
+        }
         return Colors.transparent;
       }),
       side: const BorderSide(color: AppColors.greyScaleColor),

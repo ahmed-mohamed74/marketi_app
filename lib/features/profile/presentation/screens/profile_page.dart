@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/routing/app_routes.dart';
@@ -13,19 +14,8 @@ import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:marketi_app/features/profile/presentation/widgets/list_tile_widget.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
-
-  @override
-  State<ProfilePage> createState() => _ProfilePageState();
-}
-
-class _ProfilePageState extends State<ProfilePage> {
-  @override
-  void initState() {
-    context.read<ProfileCubit>().getUserData();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,8 +122,17 @@ class _ProfilePageState extends State<ProfilePage> {
                       },
                       builder: (context, state) {
                         return BlocBuilder<ThemeCubit, ThemeMode>(
-                          builder: (context, state) {
-                            bool isDarkMode = state == ThemeMode.dark;
+                          builder: (context, themeMode) {
+                            bool isDarkMode;
+                            if (themeMode == ThemeMode.system) {
+                              var brightness = SchedulerBinding
+                                  .instance
+                                  .platformDispatcher
+                                  .platformBrightness;
+                              isDarkMode = brightness == Brightness.dark;
+                            } else {
+                              isDarkMode = themeMode == ThemeMode.dark;
+                            }
                             return ListTileWidget(
                               leadingIcon: Icons.mode_night_outlined,
                               title: 'Dark Mode',
@@ -159,7 +158,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       'Provide Feedback',
                       () {},
                     ),
-                    _buildItem(Icons.logout_outlined, 'Log Out', () async{
+                    _buildItem(Icons.logout_outlined, 'Log Out', () async {
                       context.read<AuthBloc>().add(AuthLogout());
                       await Future.delayed(const Duration(milliseconds: 100));
                       serviceLocator<AppStateService>().updateAuthState();

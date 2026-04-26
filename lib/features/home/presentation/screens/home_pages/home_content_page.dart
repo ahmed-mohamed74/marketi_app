@@ -18,14 +18,9 @@ import 'package:marketi_app/features/home/presentation/widgets/search_section_wi
 import 'package:marketi_app/features/home/presentation/widgets/section_header_widget.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
   List<T> _getMockItems<T>(String sectionType) {
     if (sectionType == 'Categories') {
       return List.generate(
@@ -36,18 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
       return List.generate(6, (index) => BrandModel(emoji: '', name: '') as T);
     }
     return List.generate(4, (index) => ProductModel() as T);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    final cubit = context.read<HomeCubit>();
-    cubit.getPopularProducts();
-    cubit.getBestProducts();
-    cubit.getBuyAgainProducts();
-    cubit.getCategories();
-    cubit.getBrands();
-    context.read<GetFavouriteCubit>().getFavouriteProducts();
   }
 
   Widget _buildSection<T>({

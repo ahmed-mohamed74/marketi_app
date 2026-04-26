@@ -10,7 +10,6 @@ import 'package:marketi_app/features/checkout/presentation/widgets/address_card.
 import 'package:marketi_app/features/checkout/presentation/widgets/info_tile.dart';
 import 'package:marketi_app/features/checkout/presentation/widgets/order_summery_card.dart';
 import 'package:marketi_app/features/checkout/presentation/widgets/voucher_section.dart';
-import 'package:marketi_app/features/home/presentation/cubits/navigation_cubit/navigation_cubit.dart';
 import 'package:marketi_app/features/order/data/models/order_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -39,10 +38,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             padding: EdgeInsets.all(5.0),
             child: GestureDetector(
               onTap: () {
-                setState(() {
-                  context.read<NavigationCubit>().updateIndex(3);
-                  context.push(AppRoutes.home);
-                });
+                  context.push(AppRoutes.profile);
               },
               child: CircleAvatar(
                 child: Icon(Icons.person_2_outlined, size: 30),
