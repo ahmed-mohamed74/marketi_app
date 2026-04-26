@@ -29,7 +29,6 @@ class _AllProductsPageState extends State<AllProductsPage> {
   void initState() {
     super.initState();
     homeCubit = context.read<HomeCubit>();
-    homeCubit.getAllProducts();
     context.read<GetFavouriteCubit>().getFavouriteProducts();
 
     _scrollController.addListener(() {

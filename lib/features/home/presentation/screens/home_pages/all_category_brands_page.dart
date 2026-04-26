@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,7 @@ import 'package:marketi_app/features/home/data/models/brand_model.dart';
 import 'package:marketi_app/features/home/data/models/category_model.dart';
 import 'package:marketi_app/features/home/presentation/cubits/home_cubit/home_cubit.dart';
 import 'package:marketi_app/features/home/presentation/widgets/search_section_widget.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class AllCategoryBrandsPage extends StatefulWidget {
   final List<CategoryModel> categoryItems;
@@ -114,10 +116,32 @@ class _AllCategoryBrandsPageState extends State<AllCategoryBrandsPage> {
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
                                     child: (widget.appBarTitle == 'Category')
-                                        ? Image.network(
-                                            widget.categoryItems[index].image,
-                                            fit: BoxFit.contain,
-                                          )
+                                        ?CachedNetworkImage(
+                                          imageUrl: widget.categoryItems[index].image,
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                          fit: BoxFit.contain,
+                                          fadeInDuration: const Duration(
+                                            milliseconds: 500,
+                                          ),
+                                          placeholder: (context, url) {
+                                            return Skeletonizer(
+                                              containersColor:
+                                                  Colors.grey[300]!,
+                                              child: Container(
+                                                width: double.infinity,
+                                                height: double.infinity,
+                                                color: Colors.white,
+                                              ),
+                                            );
+                                          },
+                                          errorWidget: (context, url, error) {
+                                            return Image.asset(
+                                              'assets/images/default_image.png',
+                                              fit: BoxFit.contain,
+                                            );
+                                          },
+                                        )
                                         : Text(
                                             widget.brandItems[index].emoji ?? '',
                                             style: TextStyle(fontSize: 35),

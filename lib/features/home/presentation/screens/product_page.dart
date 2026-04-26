@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +7,7 @@ import 'package:marketi_app/core/routing/app_routes.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/features/cart/presentation/cart_cubits/add_product_cubit/add_product_cubit.dart';
 import 'package:marketi_app/features/home/data/models/product_model.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class ProductDetailsPage extends StatefulWidget {
   final ProductModel? product;
@@ -32,7 +34,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             child: IconButton(
               icon: Icon(Icons.shopping_cart_outlined, size: 30),
               onPressed: () {
-                  context.go(AppRoutes.cart);
+                context.go(AppRoutes.cart);
               },
             ),
           ),
@@ -54,12 +56,36 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Main Product Image
               Center(
-                child: Image.network(
-                  widget.product?.images?.first ??
-                      'https://placehold.co/300x300.png?text=Pampers+Box', // Replace with your asset
-                  height: 250,
+                child: CachedNetworkImage(
+                  imageUrl:
+                      widget.product?.images?.first ??
+                      'https://placehold.co/300x300.png?text=Pampers+Box',
+                  width: double.infinity,
+                  // التعديل هنا: حدد ارتفاع ثابت بدلاً من infinity
+                  height: 300,
+                  fit: BoxFit.contain,
+                  fadeInDuration: const Duration(milliseconds: 500),
+                  placeholder: (context, url) {
+                    return Skeletonizer(
+                      enabled: true, // تأكد من تفعيلها
+                      containersColor: Colors.grey[300]!,
+                      child: Container(
+                        width: double.infinity,
+                        height: 300, // نفس الارتفاع هنا أيضاً
+                        color: Colors.white,
+                      ),
+                    );
+                  },
+                  errorWidget: (context, url, error) {
+                    return Container(
+                      height: 300,
+                      child: Image.asset(
+                        'assets/images/default_image.png',
+                        fit: BoxFit.contain,
+                      ),
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: 10),

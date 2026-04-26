@@ -141,7 +141,6 @@ class _CategoryPageState extends State<CategoryPage> {
                               final bool isProductInFav = favIds.contains(
                                 product.id,
                               );
-
                               return Column(
                                 children: [
                                   GestureDetector(
