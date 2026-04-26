@@ -55,6 +55,7 @@ dependencies:
   hive_flutter: ^1.1.0
   intl: ^0.20.2
   flutter_launcher_icons: ^0.14.4
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_test:
@@ -97,7 +98,6 @@ flutter:
     - assets/images/
     - assets/images/onboarding_images/
     - assets/images/auth_images/
-    - assets/images/dummy_images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

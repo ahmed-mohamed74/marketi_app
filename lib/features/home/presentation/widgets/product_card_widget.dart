@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:marketi_app/core/themes/colors.dart';
@@ -5,6 +6,8 @@ import 'package:marketi_app/features/cart/presentation/cart_cubits/add_product_c
 import 'package:marketi_app/features/favorite/presentation/favourite_cubits/add_favourite_cubit/add_favourite_cubit.dart';
 import 'package:marketi_app/features/favorite/presentation/favourite_cubits/delete_favourite_cubit/delete_favourite_cubit.dart';
 import 'package:marketi_app/features/home/data/models/product_model.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+
 class ProductCardWidget extends StatelessWidget {
   final ProductModel product;
   final bool isFavourite;
@@ -34,32 +37,29 @@ class ProductCardWidget extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(5),
-                    child: product.images?.isNotEmpty == true
-                        ? Image.network(
-                            product.images!.first,
+                    child: CachedNetworkImage(
+                      imageUrl: product.images!.first,
+                      width: double.infinity,
+                      height: double.infinity,
+                      fit: BoxFit.contain,
+                      fadeInDuration: const Duration(milliseconds: 500),
+                      placeholder: (context, url) {
+                        return Skeletonizer(
+                          containersColor: Colors.grey[300]!,
+                          child: Container(
                             width: double.infinity,
                             height: double.infinity,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: Colors.grey[200],
-                                child: const Icon(
-                                  Icons.image_outlined,
-                                  color: Colors.grey,
-                                ),
-                              );
-                            },
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Container(color: Colors.grey[100]);
-                            },
-                          )
-                        : Image.asset(
-                            'assets/images/product2_image.png',
-                            width: double.infinity,
-                            height: double.infinity,
-                            fit: BoxFit.contain,
+                            color: Colors.white,
                           ),
+                        );
+                      },
+                      errorWidget: (context, url, error) {
+                        return Image.asset(
+                          'assets/images/default_image.png',
+                          fit: BoxFit.contain,
+                        );
+                      },
+                    ),
                   ),
                   Positioned(
                     top: 4,

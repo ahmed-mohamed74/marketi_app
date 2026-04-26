@@ -57,22 +57,22 @@ class AppRouterService {
 
         GoRoute(
           path: AppRoutes.login,
-          builder: (context, state) => BlocProvider(
-            create: (context) => AuthBloc(authRepository: serviceLocator()),
+          builder: (context, state) => BlocProvider.value(
+            value: serviceLocator<AuthBloc>(),
             child: const LoginPage(),
           ),
         ),
         GoRoute(
           path: AppRoutes.signUp,
-          builder: (context, state) => BlocProvider(
-            create: (context) => AuthBloc(authRepository: serviceLocator()),
+          builder: (context, state) => BlocProvider.value(
+            value: serviceLocator<AuthBloc>(),
             child: const SignUpPage(),
           ),
         ),
         GoRoute(
           path: AppRoutes.resetPage,
-          builder: (context, state) => BlocProvider(
-            create: (context) => AuthBloc(authRepository: serviceLocator()),
+          builder: (context, state) => BlocProvider.value(
+            value: serviceLocator<AuthBloc>(),
             child: const ResetPasswordPage(),
           ),
         ),
@@ -80,8 +80,8 @@ class AppRouterService {
           path: AppRoutes.verificationPage,
           builder: (context, state) {
             final email = state.extra as String?;
-            return BlocProvider(
-              create: (context) => AuthBloc(authRepository: serviceLocator()),
+            return BlocProvider.value(
+              value: serviceLocator<AuthBloc>(),
               child: VerificationCodePage(email: email ?? ''),
             );
           },
@@ -90,16 +90,16 @@ class AppRouterService {
           path: AppRoutes.newPasswordPage,
           builder: (context, state) {
             final email = state.extra as String?;
-            return BlocProvider(
-              create: (context) => AuthBloc(authRepository: serviceLocator()),
+            return BlocProvider.value(
+              value: serviceLocator<AuthBloc>(),
               child: NewPasswordPage(email: email ?? ''),
             );
           },
         ),
         GoRoute(
           path: AppRoutes.congratulationPage,
-          builder: (context, state) => BlocProvider(
-            create: (context) => AuthBloc(authRepository: serviceLocator()),
+          builder: (context, state) => BlocProvider.value(
+            value: serviceLocator<AuthBloc>(),
             child: const CongratulationPage(),
           ),
         ),
@@ -108,46 +108,20 @@ class AppRouterService {
           builder: (context, state, navigationShell) {
             return MultiBlocProvider(
               providers: [
-                BlocProvider(
-                  create: (context) =>
-                      HomeCubit(homeRepository: serviceLocator()),
+                BlocProvider.value(value: serviceLocator<HomeCubit>()),
+                BlocProvider.value(value: serviceLocator<ProfileCubit>()),
+                BlocProvider.value(value: serviceLocator<AddProductCubit>()),
+                BlocProvider.value(value: serviceLocator<GetProductsCubit>()),
+                BlocProvider.value(value: serviceLocator<DeleteProductCubit>()),
+                BlocProvider.value(value: serviceLocator<AddFavouriteCubit>()),
+                BlocProvider.value(
+                  value: serviceLocator<DeleteFavouriteCubit>(),
                 ),
-                BlocProvider(
-                    create: (context) =>
-                        ProfileCubit(profileRepository: serviceLocator()),
-                  ),
-                BlocProvider(
-                  create: (context) =>
-                      AddProductCubit(cartRepository: serviceLocator()),
-                ),
-                BlocProvider(
-                  create: (context) =>
-                      GetProductsCubit(cartRepository: serviceLocator()),
-                ),
-                BlocProvider(
-                  create: (context) =>
-                      DeleteProductCubit(cartRepository: serviceLocator()),
-                ),
-                BlocProvider(
-                  create: (context) =>
-                      AddFavouriteCubit(favouriteRepository: serviceLocator()),
-                ),
-                BlocProvider(
-                  create: (context) => DeleteFavouriteCubit(
-                    favouriteRepository: serviceLocator(),
-                  ),
-                ),
-                BlocProvider(
-                  create: (context) =>
-                      GetFavouriteCubit(favouriteRepository: serviceLocator()),
-                ),
-                BlocProvider(
-                  create: (context) =>
-                      AuthBloc(authRepository: serviceLocator()),
-                ),
+                BlocProvider.value(value: serviceLocator<GetFavouriteCubit>()),
+                BlocProvider.value(value: serviceLocator<AuthBloc>()),
               ],
 
-              child: HomePage(navigationShell: navigationShell,),
+              child: HomePage(navigationShell: navigationShell),
             );
           },
           branches: [
@@ -192,14 +166,8 @@ class AppRouterService {
             final product = state.extra as ProductModel?;
             return MultiBlocProvider(
               providers: [
-                BlocProvider(
-                  create: (context) =>
-                      HomeCubit(homeRepository: serviceLocator()),
-                ),
-                BlocProvider(
-                  create: (context) =>
-                      AddProductCubit(cartRepository: serviceLocator()),
-                ),
+                BlocProvider.value(value: serviceLocator<HomeCubit>()),
+                BlocProvider.value(value: serviceLocator<AddProductCubit>()),
               ],
               child: ProductDetailsPage(product: product),
             );
@@ -211,27 +179,13 @@ class AppRouterService {
             final categoryName = state.extra as String?;
             return MultiBlocProvider(
               providers: [
-                BlocProvider(
-                  create: (context) =>
-                      HomeCubit(homeRepository: serviceLocator()),
+                BlocProvider.value(value: serviceLocator<HomeCubit>()),
+                BlocProvider.value(value: serviceLocator<AddProductCubit>()),
+                BlocProvider.value(value: serviceLocator<AddFavouriteCubit>()),
+                BlocProvider.value(
+                  value: serviceLocator<DeleteFavouriteCubit>(),
                 ),
-                BlocProvider(
-                  create: (context) =>
-                      AddProductCubit(cartRepository: serviceLocator()),
-                ),
-                BlocProvider(
-                  create: (context) =>
-                      AddFavouriteCubit(favouriteRepository: serviceLocator()),
-                ),
-                BlocProvider(
-                  create: (context) => DeleteFavouriteCubit(
-                    favouriteRepository: serviceLocator(),
-                  ),
-                ),
-                BlocProvider(
-                  create: (context) =>
-                      GetFavouriteCubit(favouriteRepository: serviceLocator()),
-                ),
+                BlocProvider.value(value: serviceLocator<GetFavouriteCubit>()),
               ],
               child: CategoryPage(categoryName: categoryName),
             );
@@ -243,27 +197,13 @@ class AppRouterService {
             final brandName = state.extra as String?;
             return MultiBlocProvider(
               providers: [
-                BlocProvider(
-                  create: (context) =>
-                      HomeCubit(homeRepository: serviceLocator()),
+                BlocProvider.value(value: serviceLocator<HomeCubit>()),
+                BlocProvider.value(value: serviceLocator<AddProductCubit>()),
+                BlocProvider.value(value: serviceLocator<AddFavouriteCubit>()),
+                BlocProvider.value(
+                  value: serviceLocator<DeleteFavouriteCubit>(),
                 ),
-                BlocProvider(
-                  create: (context) =>
-                      AddProductCubit(cartRepository: serviceLocator()),
-                ),
-                BlocProvider(
-                  create: (context) =>
-                      AddFavouriteCubit(favouriteRepository: serviceLocator()),
-                ),
-                BlocProvider(
-                  create: (context) => DeleteFavouriteCubit(
-                    favouriteRepository: serviceLocator(),
-                  ),
-                ),
-                BlocProvider(
-                  create: (context) =>
-                      GetFavouriteCubit(favouriteRepository: serviceLocator()),
-                ),
+                BlocProvider.value(value: serviceLocator<GetFavouriteCubit>()),
               ],
               child: BrandPage(brandName: brandName),
             );
@@ -275,27 +215,13 @@ class AppRouterService {
             final title = state.extra as String;
             return MultiBlocProvider(
               providers: [
-                BlocProvider(
-                  create: (context) =>
-                      HomeCubit(homeRepository: serviceLocator()),
+                BlocProvider.value(value: serviceLocator<HomeCubit>()),
+                BlocProvider.value(value: serviceLocator<AddProductCubit>()),
+                BlocProvider.value(value: serviceLocator<AddFavouriteCubit>()),
+                BlocProvider.value(
+                  value: serviceLocator<DeleteFavouriteCubit>(),
                 ),
-                BlocProvider(
-                  create: (context) =>
-                      AddProductCubit(cartRepository: serviceLocator()),
-                ),
-                BlocProvider(
-                  create: (context) =>
-                      AddFavouriteCubit(favouriteRepository: serviceLocator()),
-                ),
-                BlocProvider(
-                  create: (context) => DeleteFavouriteCubit(
-                    favouriteRepository: serviceLocator(),
-                  ),
-                ),
-                BlocProvider(
-                  create: (context) =>
-                      GetFavouriteCubit(favouriteRepository: serviceLocator()),
-                ),
+                BlocProvider.value(value: serviceLocator<GetFavouriteCubit>()),
               ],
               child: AllProductsPage(appBarTitle: title),
             );
@@ -310,8 +236,8 @@ class AppRouterService {
             final title = data['title'] as String;
             final categoryItems = data['categoryItems'] as List<CategoryModel>;
             final brandItems = data['brandItems'] as List<BrandModel>;
-            return BlocProvider(
-              create: (context) => HomeCubit(homeRepository: serviceLocator()),
+            return BlocProvider.value(
+              value: serviceLocator<HomeCubit>(),
               child: AllCategoryBrandsPage(
                 appBarTitle: title,
                 categoryItems: categoryItems,
@@ -326,18 +252,16 @@ class AppRouterService {
           builder: (context, state) {
             final order = state.extra as OrderModel?;
 
-            return BlocProvider(
-              create: (context) =>
-                  PaymentCubit(orderLocalService: serviceLocator()),
+            return BlocProvider.value(
+              value: serviceLocator<PaymentCubit>(),
               child: CheckoutPage(orderModel: order),
             );
           },
         ),
         GoRoute(
           path: AppRoutes.orderHistoryPage,
-          builder: (context, state) => BlocProvider(
-            create: (context) =>
-                OrderCubit(orderLocalService: serviceLocator()),
+          builder: (context, state) => BlocProvider.value(
+            value: serviceLocator<OrderCubit>(),
             child: const OredrHistory(),
           ),
         ),

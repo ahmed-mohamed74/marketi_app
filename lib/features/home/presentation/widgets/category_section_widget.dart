@@ -1,9 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:marketi_app/core/routing/app_routes.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/features/home/data/models/brand_model.dart';
 import 'package:marketi_app/features/home/data/models/category_model.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class CategoryBrandSectionWidget extends StatelessWidget {
   final List<CategoryModel> categoryItems;
@@ -67,8 +69,31 @@ class CategoryBrandSectionWidget extends StatelessWidget {
                                           brandItems[index].emoji!,
                                           style: TextStyle(fontSize: 40),
                                         )
-                                      : Image.network(
-                                          categoryItems[index].image,
+                                      : CachedNetworkImage(
+                                          imageUrl: categoryItems[index].image,
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                          fit: BoxFit.contain,
+                                          fadeInDuration: const Duration(
+                                            milliseconds: 500,
+                                          ),
+                                          placeholder: (context, url) {
+                                            return Skeletonizer(
+                                              containersColor:
+                                                  Colors.grey[300]!,
+                                              child: Container(
+                                                width: double.infinity,
+                                                height: double.infinity,
+                                                color: Colors.white,
+                                              ),
+                                            );
+                                          },
+                                          errorWidget: (context, url, error) {
+                                            return Image.asset(
+                                              'assets/images/default_image.png',
+                                              fit: BoxFit.contain,
+                                            );
+                                          },
                                         ),
                                 ),
                               ),

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:marketi_app/core/api/end_points.dart';
 import 'package:marketi_app/core/services/cache/cache_helper.dart';
+import 'package:shared_preferences/src/shared_preferences_legacy.dart';
 
 class AppStateService extends ChangeNotifier {
+  AppStateService(SharedPreferences sharedPreferences);
+
   bool getFirstTime() {
     return CacheHelper().getData(key: 'isFirstTime') ?? true;
   }

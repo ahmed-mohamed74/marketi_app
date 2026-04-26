@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:marketi_app/core/constants/app_sizes.dart';
@@ -7,6 +8,9 @@ import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/features/cart/presentation/cart_cubits/add_product_cubit/add_product_cubit.dart';
 import 'package:marketi_app/features/favorite/presentation/favourite_cubits/add_favourite_cubit/add_favourite_cubit.dart';
 import 'package:marketi_app/features/favorite/presentation/favourite_cubits/delete_favourite_cubit/delete_favourite_cubit.dart';
+import 'package:marketi_app/features/favorite/presentation/favourite_cubits/get_favourites_cubit/get_favourites_cubit.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+
 class ProductCardWithDetails extends StatelessWidget {
   final String? id;
   final String? name;
@@ -40,15 +44,23 @@ class ProductCardWithDetails extends StatelessWidget {
       padding: const EdgeInsets.all(10),
       child: Row(
         children: [
-          Container(
-            width: AppSizes(context: context).screenWidth * 0.22,
-            height: AppSizes(context: context).screenWidth * 0.22,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              image: DecorationImage(
-                image: image != null
-                    ? NetworkImage(image!)
-                    : AssetImage('assets/images/product2_image.png'),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: CachedNetworkImage(
+              imageUrl: image ?? '',
+              width: AppSizes(context: context).screenWidth * 0.22,
+              height: AppSizes(context: context).screenWidth * 0.22,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Skeletonizer(
+                enabled: true,
+                child: Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  color: Colors.grey[300],
+                ),
+              ),
+              errorWidget: (context, url, error) => Image.asset(
+                'assets/images/default_image.png',
                 fit: BoxFit.cover,
               ),
             ),
@@ -72,6 +84,9 @@ class ProductCardWithDetails extends StatelessWidget {
                     ),
                     GestureDetector(
                       onTap: () {
+                        context
+                            .read<GetFavouriteCubit>()
+                            .getFavouriteProducts();
                         if (isFavourite) {
                           context
                               .read<DeleteFavouriteCubit>()
@@ -105,7 +120,7 @@ class ProductCardWithDetails extends StatelessWidget {
                 inCart
                     ? Container()
                     : Row(
-                        children:  [
+                        children: [
                           Icon(
                             Icons.access_time,
                             size: 16,
@@ -122,12 +137,18 @@ class ProductCardWithDetails extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Price: $price EGP", style: Theme.of(context).textTheme.titleSmall),
+                    Text(
+                      "Price: $price EGP",
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
                     Row(
                       children: [
                         const Icon(Icons.star_border, size: 18),
                         const SizedBox(width: 2),
-                        Text(rate ?? '0.0', style: Theme.of(context).textTheme.bodySmall),
+                        Text(
+                          rate ?? '0.0',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
                       ],
                     ),
                   ],
@@ -154,9 +175,8 @@ class ProductCardWithDetails extends StatelessWidget {
                           ),
                           Text(
                             '$quantity',
-                            style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                              color: AppColors.primaryColor,
-                            ),
+                            style: Theme.of(context).textTheme.titleSmall!
+                                .copyWith(color: AppColors.primaryColor),
                           ),
                           CircleAvatar(
                             backgroundColor: AppColors.lightBlueColor

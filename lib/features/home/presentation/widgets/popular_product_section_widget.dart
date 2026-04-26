@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,8 @@ import 'package:marketi_app/features/favorite/presentation/favourite_cubits/add_
 import 'package:marketi_app/features/favorite/presentation/favourite_cubits/delete_favourite_cubit/delete_favourite_cubit.dart';
 import 'package:marketi_app/features/favorite/presentation/favourite_cubits/get_favourites_cubit/get_favourites_cubit.dart';
 import 'package:marketi_app/features/home/data/models/product_model.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+
 class ProductsSectionWidget extends StatelessWidget {
   final List<ProductModel> popularProducts;
   final bool withAddButton;
@@ -63,31 +66,34 @@ class ProductsSectionWidget extends StatelessWidget {
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(5),
-                                    child:
-                                        popularProducts[index].images?.first !=
-                                            null
-                                        ? Image.network(
-                                            popularProducts[index]
-                                                .images!
-                                                .first,
-                                            errorBuilder:
-                                                (
-                                                  context,
-                                                  error,
-                                                  stackTrace,
-                                                ) => Image.asset(
-                                                  'assets/images/product2_image.png',
-                                                  width: double.infinity,
-                                                  height: double.infinity,
-                                                  fit: BoxFit.contain,
-                                                ),
-                                          )
-                                        : Image.asset(
-                                            'assets/images/product2_image.png',
+                                    child: CachedNetworkImage(
+                                      imageUrl: popularProducts[index]
+                                          .images!
+                                          .first
+                                          .trim(),
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      fit: BoxFit.contain,
+                                      fadeInDuration: const Duration(
+                                        milliseconds: 500,
+                                      ),
+                                      placeholder: (context, url) {
+                                        return Skeletonizer(
+                                          containersColor: Colors.grey[300]!,
+                                          child: Container(
                                             width: double.infinity,
                                             height: double.infinity,
-                                            fit: BoxFit.contain,
+                                            color: Colors.white,
                                           ),
+                                        );
+                                      },
+                                      errorWidget: (context, url, error) {
+                                        return Image.asset(
+                                          'assets/images/default_image.png',
+                                          fit: BoxFit.contain,
+                                        );
+                                      },
+                                    ),
                                   ),
                                   Positioned(
                                     top: 4,
@@ -178,9 +184,12 @@ class ProductsSectionWidget extends StatelessWidget {
                                   ),
                                   child: Text(
                                     'Add',
-                                    style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                                      color: AppColors.primaryColor,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall!
+                                        .copyWith(
+                                          color: AppColors.primaryColor,
+                                        ),
                                   ),
                                 ),
                               ),

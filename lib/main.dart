@@ -11,7 +11,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Stripe.publishableKey = StripeKeys.publishableKey;
   await serviceLocatorInit();
-  CacheHelper().init();
+  await CacheHelper().init();
   final appStateService = serviceLocator<AppStateService>();
   final router = AppRouterService(appStateService).router;
   runApp(MyApp(router: router, appStateService: appStateService));
