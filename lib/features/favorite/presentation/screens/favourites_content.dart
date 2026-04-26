@@ -19,11 +19,7 @@ class FavouriteScreen extends StatefulWidget {
 }
 
 class _FavouriteScreenState extends State<FavouriteScreen> {
-  @override
-  void initState() {
-    super.initState();
-    context.read<GetFavouriteCubit>().getFavouriteProducts();
-  }
+
 
   @override
   Widget build(BuildContext context) {

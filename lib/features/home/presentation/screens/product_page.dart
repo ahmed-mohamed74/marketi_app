@@ -6,7 +6,6 @@ import 'package:marketi_app/core/routing/app_routes.dart';
 import 'package:marketi_app/core/themes/colors.dart';
 import 'package:marketi_app/features/cart/presentation/cart_cubits/add_product_cubit/add_product_cubit.dart';
 import 'package:marketi_app/features/home/data/models/product_model.dart';
-import 'package:marketi_app/features/home/presentation/cubits/navigation_cubit/navigation_cubit.dart';
 
 class ProductDetailsPage extends StatefulWidget {
   final ProductModel? product;
@@ -33,10 +32,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             child: IconButton(
               icon: Icon(Icons.shopping_cart_outlined, size: 30),
               onPressed: () {
-                setState(() {
-                  context.read<NavigationCubit>().updateIndex(1);
-                  context.go(AppRoutes.home);
-                });
+                  context.go(AppRoutes.cart);
               },
             ),
           ),

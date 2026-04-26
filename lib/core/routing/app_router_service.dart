@@ -10,6 +10,8 @@ import 'package:marketi_app/features/auth/presentation/screens/reset_password_pa
 import 'package:marketi_app/features/auth/presentation/screens/reset_password_pages/reset_password_page.dart';
 import 'package:marketi_app/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:marketi_app/features/auth/presentation/screens/reset_password_pages/verification_code_page.dart';
+import 'package:marketi_app/features/cart/presentation/screens/cart_content.dart';
+import 'package:marketi_app/features/favorite/presentation/screens/favourites_content.dart';
 import 'package:marketi_app/features/home/data/models/brand_model.dart';
 import 'package:marketi_app/features/home/data/models/category_model.dart';
 import 'package:marketi_app/features/home/data/models/product_model.dart';
@@ -27,6 +29,7 @@ import 'package:marketi_app/features/checkout/presentation/screens/checkout_page
 import 'package:marketi_app/features/home/presentation/screens/home_page.dart';
 import 'package:marketi_app/features/home/presentation/screens/home_pages/all_category_brands_page.dart';
 import 'package:marketi_app/features/home/presentation/screens/home_pages/all_products_page.dart';
+import 'package:marketi_app/features/home/presentation/screens/home_pages/home_content_page.dart';
 import 'package:marketi_app/features/home/presentation/screens/product_page.dart';
 import 'package:marketi_app/features/onboarding/presentation/screens/onbourding_screen.dart';
 import 'package:marketi_app/features/order/data/models/order_model.dart';
@@ -101,15 +104,18 @@ class AppRouterService {
           ),
         ),
 
-        GoRoute(
-          path: AppRoutes.home,
-          builder: (context, state) {
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, navigationShell) {
             return MultiBlocProvider(
               providers: [
                 BlocProvider(
                   create: (context) =>
                       HomeCubit(homeRepository: serviceLocator()),
                 ),
+                BlocProvider(
+                    create: (context) =>
+                        ProfileCubit(profileRepository: serviceLocator()),
+                  ),
                 BlocProvider(
                   create: (context) =>
                       AddProductCubit(cartRepository: serviceLocator()),
@@ -135,13 +141,51 @@ class AppRouterService {
                   create: (context) =>
                       GetFavouriteCubit(favouriteRepository: serviceLocator()),
                 ),
+                BlocProvider(
+                  create: (context) =>
+                      AuthBloc(authRepository: serviceLocator()),
+                ),
               ],
 
-              child: HomePage(),
+              child: HomePage(navigationShell: navigationShell,),
             );
           },
+          branches: [
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  name: 'home',
+                  path: '/home',
+                  builder: (context, state) => HomeScreen(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.cart,
+                  builder: (context, state) => const CartScreen(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.favorite,
+                  builder: (context, state) => const FavouriteScreen(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.profile,
+                  builder: (context, state) => const ProfilePage(),
+                ),
+              ],
+            ),
+          ],
         ),
-
         GoRoute(
           path: AppRoutes.productPage,
           builder: (context, state) {
@@ -278,14 +322,6 @@ class AppRouterService {
         ),
 
         GoRoute(
-          path: AppRoutes.profile,
-          builder: (context, state) => BlocProvider(
-            create: (context) =>
-                ProfileCubit(profileRepository: serviceLocator()),
-            child: const ProfilePage(),
-          ),
-        ),
-        GoRoute(
           path: AppRoutes.checkoutPage,
           builder: (context, state) {
             final order = state.extra as OrderModel?;
@@ -334,7 +370,7 @@ class AppRouterService {
           return AppRoutes.home;
         }
 
-        return null; 
+        return null;
       },
     );
   }
